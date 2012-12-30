@@ -132,6 +132,8 @@ sub finger
     });
   
   }, sub { $args->{timeout} };
+  
+  $self;
 }
 
 1;
