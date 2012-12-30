@@ -6,6 +6,27 @@ AnyEvent::Finger - Simple asyncronous finger
 
 version 0.01
 
+=head1 SYNOPSIS
+
+client:
+
+ use AnyEvent::Finger qw( finger_client );
+ 
+ finger_client 'localhost', 'username', sub {
+   my($lines) = @_;
+   say "[response]";
+   say join "\n", @$lines;
+ };
+
+=head1 FUNCTIONS
+
+=head2 finger_client( $server, $request, $callback, \%options )
+
+Send a finger request to the given server.  The callback will
+be called when the response is complete.  The options hash may
+be passed in as the optional forth argument to override any
+default options (See L<AnyEvent::Finger::Client> for details).
+
 =head1 AUTHOR
 
 Graham Ollis <plicease@cpan.org>
