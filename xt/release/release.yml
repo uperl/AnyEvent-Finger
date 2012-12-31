@@ -1,1 +1,9 @@
---- {}
+---
+pod_spelling_system:
+  stopwords:
+    - hostname
+    - hostnames
+
+pod_coverage:
+  private:
+    - AnyEvent::Finger.*#new

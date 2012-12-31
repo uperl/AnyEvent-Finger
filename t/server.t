@@ -15,11 +15,9 @@ isa_ok $server, 'AnyEvent::Finger::Server';
 
 eval { $server->start(
   sub {
-    my($request, $callback) = @_;
-    $callback->([
-      "request = '$request'",
-      undef
-    ]);
+    my($request, $response) = @_;
+    $response->say("request = '$request'");
+    $response->done;
   }
 ) };
 diag $@ if $@;
@@ -61,13 +59,13 @@ eval {
   $server->stop;
   $server->start(sub {
     my($req, $res) = @_;
-    $res->([
+    $res->say(
       "request_isa: " . ref($req),
       "verbose:     " . $req->verbose,
       "username:    " . $req->username,
       "hostnames:   " . join("@", @{ $req->hostnames }),
-      undef,
-    ]);
+    );
+    $res->done;
   });
 };
 diag $@ if $@;

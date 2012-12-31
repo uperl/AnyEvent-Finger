@@ -7,7 +7,7 @@ use AnyEvent::Socket qw( tcp_connect );
 use AnyEvent::Handle;
 use Carp qw( carp );
 
-# ABSTRACT: Simple asyncronous finger client
+# ABSTRACT: Simple asynchronous finger client
 # VERSION
 
 =head1 SYNOPSIS
@@ -29,7 +29,7 @@ use Carp qw( carp );
 
 =head1 DESCRIPTION
 
-Provide a simple asyncronous finger client.
+Provide a simple asynchronous finger client.
 
 =head1 CONSTRUCTOR
 

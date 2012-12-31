@@ -8,8 +8,9 @@ use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket qw( tcp_server );
 use AnyEvent::Finger::Request;
+use AnyEvent::Finger::Response;
 
-# ABSTRACT: Simple asyncronous finger server
+# ABSTRACT: Simple asynchronous finger server
 # VERSION
 
 =head1 SYNOPSIS
@@ -27,26 +28,29 @@ use AnyEvent::Finger::Request;
    if($request->listing_request)
    {
      # respond if remote requests list of users
-     $response->(['users:', keys %users, undef]);
+     $response->say('users:', keys %users);
+     $response->done;
    }
    else
    {
      # respond if user exists
      if(defined $users{$request->username})
      {
-       $response->([$users{$request}, undef]);
+       $response->say($users{$request->username});
+       $response->done;
      }
      # respond if user does not exist
      else
      {
-       $response->(['no such user', undef]);
+       $response->say('no such user');
+       $response->done;
      }
    }
  );
 
 =head1 DESCRIPTION
 
-Provide a simple asyncronous finger server.
+Provide a simple asynchronous finger server.
 
 =head1 CONSTRUCTOR
 
@@ -100,35 +104,27 @@ client connects.
 The first argument passed to the callback is the request object,
 an instance of L<AnyEvent::Finger::Request>.
 
- $response_callback->($list)
+The second argument passed to the callback is the response object,
+an instance of L<AnyEvent::Finger::Response>.  With this object
+you can return a whole response at one time:
 
-The second argument is a subref to be called when the response has
-been determined.  The response callback should be passed a list of
-lines (without line termination, ie. \n \r or \r\n).  The response
-callback may be called multiple times or just once.  The correct
-line endings will automatically be added to each line and returned
-to the client.  When the entire response is complete the response
-callback should be called with undef, or with undef as the last
-element in the list.
-
-This way you can return a whole response at one time
-
- $reponse_callback->([
+ $response->say(
    "this is the first line", 
    "this is the second line", 
    "there will be no forth line",
-   undef,
- ]);
+ );
+ $response->done;
 
-or you can send line one at a time as they become available.
+or you can send line one at a time as they become available (possibly
+asynchronously).
 
  # $dbh is a DBI database handle
  my $sth = $dbh->prepare("select user_name from user_list");
  while(my $h = $sth->fetchrow_hashref)
  {
-   $response_callback->([$h->{user_name}]);
+   $response_callback->say($h->{user_name});
  }
- $response_callback->(); # same as (undef) in this case
+ $response_callback->done;
 
 The server will unbind from its port and stop if the server
 object falls out of scope, or if the C<stop> method (see below)
@@ -166,7 +162,8 @@ sub start
     $handle->push_read( line => sub {
       my($handle, $line) = @_;
       $line =~ s/\015?\012//g;
-      $callback->(AnyEvent::Finger::Request->new($line), sub {
+      
+      my $response = sub {
         my $lines = shift;
         $lines = [ $lines ] unless ref $lines eq 'ARRAY';
         foreach my $line (@$lines)
@@ -181,7 +178,11 @@ sub start
             return;
           }
         }
-      });
+      };
+      
+      bless $response, 'AnyEvent::Finger::Response';
+      
+      $callback->(AnyEvent::Finger::Request->new($line), $response);
     });
   };
   

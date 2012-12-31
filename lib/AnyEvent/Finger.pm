@@ -7,7 +7,7 @@ use base qw( Exporter );
 
 our @EXPORT_OK = qw( finger_client finger_server );
 
-# ABSTRACT: Simple asyncronous finger client and server
+# ABSTRACT: Simple asynchronous finger client and server
 # VERSION
 
 =head1 SYNOPSIS
@@ -36,21 +36,22 @@ server:
    if($request->listing_request)
    {
      # respond if remote requests list of users
-     $response->(['users:', keys %users, undef]);
+     $response->say('users: ', keys %users);
    }
    else
    {
      # respond if user exists
      if(defined $users{$request->username})
      {
-       $response->([$users{$request}, undef]);
+       $response->say($users{$request});
      }
      # respond if user does not exist
      else
      {
-       $response->(['no such user', undef]);
+       $response->say('no such user');
      }
    }
+   $response->done;
  };
 
 =head1 FUNCTIONS

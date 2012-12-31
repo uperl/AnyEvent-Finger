@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use overload '""' => sub { shift->as_string };
 
-# ABSTRACT: Simple asyncronous finger request
+# ABSTRACT: Simple asynchronous finger request
 # VERSION
 
 =head1 CONSTRUCTOR
