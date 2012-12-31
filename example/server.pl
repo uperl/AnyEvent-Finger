@@ -2,11 +2,14 @@
 
 use strict;
 use warnings;
+use v5.10;
 use AnyEvent::Finger::Server;
 
 # bind to 79 if root, otherwise use
 # an unprivilaged port
-my $port = $> ? 8079 : 79;
+my $port = ($> && $^O !~ /^(cygwin|MSWin32)$/) ? 8079 : 79;
+
+say "listening to port $port";
 
 my $server = AnyEvent::Finger::Server->new( port => $port );
 
