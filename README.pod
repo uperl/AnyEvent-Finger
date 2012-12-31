@@ -64,6 +64,11 @@ Start listening to finger callbacks and call the given callback
 for each request.  See L<AnyEvent::Finger::Server> for details
 on the options and the callback.
 
+=head1 SEE ALSO
+
+L<AnyEvent::Finger::Client>,
+L<AnyEvent::Finger::Server>
+
 =head1 AUTHOR
 
 Graham Ollis <plicease@cpan.org>

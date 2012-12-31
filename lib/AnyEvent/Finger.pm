@@ -90,3 +90,10 @@ sub finger_server
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<AnyEvent::Finger::Client>,
+L<AnyEvent::Finger::Server>
+
+=cut
