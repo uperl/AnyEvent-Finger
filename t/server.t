@@ -1,13 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
-my $port = 8000+int(rand(1024));
-diag "port $port";
-
-my $server = eval { AnyEvent::Finger::Server->new( port => $port, hostname => '127.0.0.1' ) };
+my $server = eval { 
+  AnyEvent::Finger::Server->new( 
+    port     => 0, 
+    hostname => '127.0.0.1',
+  );
+};
 diag $@ if $@;
 isa_ok $server, 'AnyEvent::Finger::Server';
 
@@ -21,6 +23,9 @@ eval { $server->start(
   }
 ) };
 diag $@ if $@;
+
+my $port = $server->bindport;
+like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
 my $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say STDERR shift; exit 2 } );
 

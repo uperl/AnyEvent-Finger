@@ -3,6 +3,7 @@ package AnyEvent::Finger::Server;
 use strict;
 use warnings;
 use v5.10;
+use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket qw( tcp_server );
 
@@ -140,7 +141,7 @@ sub start
   $args->{$_} //= $self->{$_}
     for qw( hostname port on_error );
 
-  tcp_server $args->{hostname}, $args->{port}, sub {
+  my $cb = sub {
     my ($fh, $host, $port) = @_;
     
     my $handle;
@@ -178,7 +179,33 @@ sub start
     });
   };
   
+  if($args->{port} == 0)
+  {
+    my $done = AnyEvent->condvar;
+    tcp_server $args->{hostname}, undef, $cb, sub {
+      my($fh, $host, $port) = @_;
+      $self->{bindport} = $port;
+      $done->send;
+    };
+    $done->recv;
+  }
+  else
+  {
+    tcp_server $args->{hostname}, $args->{port}, $cb;
+    $self->{bindport} = $self->{port};
+  }
+  
   $self;
 }
+
+=head2 $server-E<gt>bindport
+
+The bind port.  If port is set to zero in the constructor or on
+start, then an ephemeral port will be used, and you can get the
+port number here.
+
+=cut
+
+sub bindport { shift->{bindport} }
 
 1;

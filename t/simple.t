@@ -1,23 +1,22 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use AnyEvent;
 use AnyEvent::Finger qw( finger_server finger_client );
 
-my $port = 8000+int(rand(1024));
-diag "port $port";
-
-eval { 
-  use YAML ();
-  finger_server sub {
+my $port = eval { 
+  my $server = finger_server sub {
     my($request, $callback) = @_;
     $callback->([
       "request = '$request'",
       undef,
     ]);
-  }, { port => $port, hostname => '127.0.0.1' };
+  }, { port => 0, hostname => '127.0.0.1' };
+  $server->bindport;
 };
 diag $@ if $@;
+
+like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
 my $error = sub { say STDERR shift; exit 2 };
 
