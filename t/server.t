@@ -4,7 +4,10 @@ use Test::More tests => 3;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
-my $server = eval { AnyEvent::Finger::Server->new( port => 8079 ) };
+my $port = 8000+int(rand(1024));
+diag "port $port";
+
+my $server = eval { AnyEvent::Finger::Server->new( port => $port, hostname => '127.0.0.1' ) };
 diag $@ if $@;
 isa_ok $server, 'AnyEvent::Finger::Server';
 
@@ -19,7 +22,7 @@ eval { $server->start(
 ) };
 diag $@ if $@;
 
-my $client = AnyEvent::Finger::Client->new( port => 8079, on_error => sub { say STDERR shift; exit 2 } );
+my $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say STDERR shift; exit 2 } );
 
 do {
   my $done = AnyEvent->condvar;

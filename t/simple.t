@@ -4,14 +4,18 @@ use Test::More tests => 2;
 use AnyEvent;
 use AnyEvent::Finger qw( finger_server finger_client );
 
+my $port = 8000+int(rand(1024));
+diag "port $port";
+
 eval { 
+  use YAML ();
   finger_server sub {
     my($request, $callback) = @_;
     $callback->([
       "request = '$request'",
       undef,
     ]);
-  }, { port => 8079 };
+  }, { port => $port, hostname => '127.0.0.1' };
 };
 diag $@ if $@;
 
@@ -24,7 +28,7 @@ do {
   finger_client '127.0.0.1', '', sub {
     ($lines) = shift;
     $done->send;
-  }, { port => 8079, on_error => $error};
+  }, { port => $port, on_error => $error};
   
   $done->recv;
   
@@ -38,7 +42,7 @@ do {
   finger_client '127.0.0.1', 'grimlock', sub {
     ($lines) = shift;
     $done->send;
-  }, { port => 8079, on_error => $error };
+  }, { port => $port, on_error => $error };
   
   $done->recv;
   
