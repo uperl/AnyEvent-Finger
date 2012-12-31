@@ -8,7 +8,11 @@ use AnyEvent::Finger::Client;
 
 my $done = AnyEvent->condvar;
 
-my $client = AnyEvent::Finger::Client->new;
+# bind to 79 if root, otherwise use
+# an unprivilaged port
+my $port = $> ? 8079 : 79;
+
+my $client = AnyEvent::Finger::Client->new( port => $port );
 
 $client->finger(shift @ARGV, sub {
   my($lines) = @_;

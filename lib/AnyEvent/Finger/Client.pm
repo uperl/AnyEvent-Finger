@@ -69,7 +69,7 @@ Passes the error string as the first argument to the callback.
 sub new
 {
   my $class = shift;
-  my $args  = ref $_[0] eq 'HASH' ? (shift) : ({@_});
+  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
   bless { 
     hostname => $args->{hostname} // '127.0.0.1',  
     port     => $args->{port}     // 79,
@@ -95,7 +95,7 @@ sub finger
   my $self     = shift;
   my $request  = shift // '';
   my $callback = shift // sub {};
-  my $args     = ref $_[0] eq 'HASH' ? (%{ shift() }) : ({@_});
+  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
   
   $args->{$_} //= $self->{$_}
     for qw( hostname port timeout on_error );
