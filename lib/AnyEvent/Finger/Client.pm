@@ -121,6 +121,8 @@ sub finger
       },
     );
     
+    if(ref $request && $request->isa('AnyEvent::Finger::Request'))
+    { $request = $request->{raw} }
     $handle->push_write("$request\015\012");
     
     $handle->on_read(sub {

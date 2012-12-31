@@ -33,10 +33,15 @@ server:
  
  finger_server sub {
    my($request, $response) = @_;
-   if($request)
+   if($request->listing_request)
+   {
+     # respond if remote requests list of users
+     $response->(['users:', keys %users, undef]);
+   }
+   else
    {
      # respond if user exists
-     if(defined $users{$request})
+     if(defined $users{$request->username})
      {
        $response->([$users{$request}, undef]);
      }
@@ -45,11 +50,6 @@ server:
      {
        $response->(['no such user', undef]);
      }
-   }
-   else
-   {
-     # respond if remote requests list of users
-     $response->(['users:', keys %users, undef]);
    }
  };
 
@@ -84,9 +84,16 @@ on the options and the callback.
 sub finger_server
 {
   require AnyEvent::Finger::Server;
-  AnyEvent::Finger::Server
+  my $server = AnyEvent::Finger::Server
     ->new
     ->start(@_);
+  # keep the server object in scope so that
+  # we don't unbind from the port.  If you 
+  # don't want this, then use the OO interface
+  # for ::Server instead.
+  state $keep = [];
+  push @$keep, $server;
+  return $server;
 }
 
 1;

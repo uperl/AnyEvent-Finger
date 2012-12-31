@@ -3,9 +3,11 @@ package AnyEvent::Finger::Server;
 use strict;
 use warnings;
 use v5.10;
+use Carp qw( croak );
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket qw( tcp_server );
+use AnyEvent::Finger::Request;
 
 # ABSTRACT: Simple asyncronous finger server
 # VERSION
@@ -22,10 +24,15 @@ use AnyEvent::Socket qw( tcp_server );
  
  $server->start(
    my($request, $response) = @_;
-   if($request)
+   if($request->listing_request)
+   {
+     # respond if remote requests list of users
+     $response->(['users:', keys %users, undef]);
+   }
+   else
    {
      # respond if user exists
-     if(defined $users{$request})
+     if(defined $users{$request->username})
      {
        $response->([$users{$request}, undef]);
      }
@@ -34,11 +41,6 @@ use AnyEvent::Socket qw( tcp_server );
      {
        $response->(['no such user', undef]);
      }
-   }
-   else
-   {
-     # respond if remote requests list of users
-     $response->(['users:', keys %users, undef]);
    }
  );
 
@@ -95,10 +97,8 @@ client connects.
 
  $callback->($request, $response_callback)
 
-The first argument passed to the callback is the name of the user
-requested by the client or empty string ('') if no specific user
-is requested (usually this means the client is requesting the list
-of users currently logged in).
+The first argument passed to the callback is the request object,
+an instance of L<AnyEvent::Finger::Request>.
 
  $response_callback->($list)
 
@@ -130,6 +130,10 @@ or you can send line one at a time as they become available.
  }
  $response_callback->(); # same as (undef) in this case
 
+The server will unbind from its port and stop if the server
+object falls out of scope, or if the C<stop> method (see below)
+is called.
+ 
 =cut
 
 sub start
@@ -137,6 +141,8 @@ sub start
   my $self     = shift;
   my $callback = shift;
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
+  
+  croak "already started" if $self->{guard};
   
   $args->{$_} //= $self->{$_}
     for qw( hostname port on_error );
@@ -160,7 +166,7 @@ sub start
     $handle->push_read( line => sub {
       my($handle, $line) = @_;
       $line =~ s/\015?\012//g;
-      $callback->($line, sub {
+      $callback->(AnyEvent::Finger::Request->new($line), sub {
         my $lines = shift;
         $lines = [ $lines ] unless ref $lines eq 'ARRAY';
         foreach my $line (@$lines)
@@ -182,7 +188,7 @@ sub start
   if($args->{port} == 0)
   {
     my $done = AnyEvent->condvar;
-    tcp_server $args->{hostname}, undef, $cb, sub {
+    $self->{guard} = tcp_server $args->{hostname}, undef, $cb, sub {
       my($fh, $host, $port) = @_;
       $self->{bindport} = $port;
       $done->send;
@@ -191,7 +197,7 @@ sub start
   }
   else
   {
-    tcp_server $args->{hostname}, $args->{port}, $cb;
+    $self->{guard} = tcp_server $args->{hostname}, $args->{port}, $cb;
     $self->{bindport} = $self->{port};
   }
   
@@ -207,5 +213,19 @@ port number here.
 =cut
 
 sub bindport { shift->{bindport} }
+
+=head2 $server-E<gt>stop
+
+Stop the server and unbind to the port.
+
+=cut
+
+sub stop
+{
+  my($self) = @_;
+  delete $self->{guard};
+  delete $self->{bindport};
+  $self;
+}
 
 1;
