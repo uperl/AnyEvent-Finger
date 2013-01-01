@@ -99,6 +99,14 @@ sub finger_server
 
 1;
 
+=head1 CAVEATS
+
+Finger is an oldish protocol and almost nobody uses it anymore.
+
+Most finger clients do not have a way to configure an alternate port.  
+Binding to the default port 79 on Unix usually requires root.  Running 
+L<AnyEvent::Finger::Server> as root is not recommended.
+
 =head1 SEE ALSO
 
 L<AnyEvent::Finger::Client>,
