@@ -7,6 +7,7 @@ use Carp qw( croak );
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket qw( tcp_server );
+use AnyEvent::Finger::Transaction;
 use AnyEvent::Finger::Request;
 use AnyEvent::Finger::Response;
 
@@ -99,21 +100,23 @@ sub new
 Start the finger server.  The callback will be called each time a
 client connects.
 
- $callback->($request, $response_callback)
+ $callback->($tx)
 
-The first argument passed to the callback is the request object,
-an instance of L<AnyEvent::Finger::Request>.
+The first argument passed to the callback is the transaction object,
+which is an instance of L<AnyEvent::Finger::Transaction>.  The most
+important members of these objects that you will want to interact
+with are C<$tx-E<gt>req> for the request (an instance of 
+L<AnyEvent::Finger::Request>) and C<$tx-E<gt>res> for the response
+interface (an instance of L<AnyEvent::Finger::Response>).
 
-The second argument passed to the callback is the response object,
-an instance of L<AnyEvent::Finger::Response>.  With this object
-you can return a whole response at one time:
+With the response object you can return a whole response at one time:
 
- $response->say(
+ $tx->res->say(
    "this is the first line", 
    "this is the second line", 
    "there will be no forth line",
  );
- $response->done;
+ $tx->res->done;
 
 or you can send line one at a time as they become available (possibly
 asynchronously).
@@ -122,9 +125,9 @@ asynchronously).
  my $sth = $dbh->prepare("select user_name from user_list");
  while(my $h = $sth->fetchrow_hashref)
  {
-   $response_callback->say($h->{user_name});
+   $tx->res->say($h->{user_name});
  }
- $response_callback->done;
+ $tx->res->done;
 
 The server will unbind from its port and stop if the server
 object falls out of scope, or if the C<stop> method (see below)
@@ -137,15 +140,15 @@ sub start
   my $self     = shift;
   my $callback = shift;
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
-  
+
   croak "already started" if $self->{guard};
-  
+
   $args->{$_} //= $self->{$_}
     for qw( hostname port on_error );
 
   my $cb = sub {
     my ($fh, $host, $port) = @_;
-    
+
     my $handle;
     $handle = AnyEvent::Handle->new(
       fh       => $fh,
@@ -158,12 +161,12 @@ sub start
         $handle->destroy;
       },
     );
-    
+
     $handle->push_read( line => sub {
       my($handle, $line) = @_;
       $line =~ s/\015?\012//g;
-      
-      my $response = sub {
+
+      my $res = sub {
         my $lines = shift;
         $lines = [ $lines ] unless ref $lines eq 'ARRAY';
         foreach my $line (@$lines)
@@ -179,10 +182,13 @@ sub start
           }
         }
       };
+
+      bless $res, 'AnyEvent::Finger::Response';
+      my $req = AnyEvent::Finger::Request->new($line);
       
-      bless $response, 'AnyEvent::Finger::Response';
-      
-      $callback->(AnyEvent::Finger::Request->new($line), $response);
+      my $tx = bless { req => $req, res => $res }, 'AnyEvent::Finger::Transaction';
+
+      $callback->($tx);
     });
   };
   

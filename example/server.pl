@@ -15,22 +15,23 @@ my $server = AnyEvent::Finger::Server->new( port => $port );
 
 $server->start(
   sub {
-    my($request, $response) = @_;
-    if($request->listing_request)
+    my $tx = shift;
+    if($tx->req->listing_request)
     {
-      $response->(['list of sers:', '', '- grimlock', undef]);
+      $tx->res->send_lines('list of sers:', '', '- grimlock');
     }
     else
     {
-      if($request->username eq 'grimlock')
+      if($tx->req->username eq 'grimlock')
       {
-        $response->(['ME GRIMLOCK HAVE AN ACCOUNT ON THIS MACHINE', undef]);
+        $tx->res->('ME GRIMLOCK HAVE AN ACCOUNT ON THIS MACHINE');
       }
       else
       {
-        $response->(['no such user', undef]);
+        $tx->res->('no such user');
       }
     }
+    $tx->res->done;
   }
 );
 

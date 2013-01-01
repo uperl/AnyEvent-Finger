@@ -6,9 +6,10 @@ use AnyEvent::Finger qw( finger_server finger_client );
 
 my $port = eval { 
   my $server = finger_server sub {
-    my($request, $callback) = @_;
-    $callback->([
-      "request = '$request'",
+    my $tx = shift;
+    my $req = $tx->req;
+    $tx->res->([
+      "request = '$req'",
       undef,
     ]);
   }, { port => 0, hostname => '127.0.0.1' };
