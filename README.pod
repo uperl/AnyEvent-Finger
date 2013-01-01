@@ -28,26 +28,26 @@ server:
  );
  
  finger_server sub {
-   my($request, $response) = @_;
-   if($request->listing_request)
+   my $tx = shift;
+   if($tx->req->listing_request)
    {
      # respond if remote requests list of users
-     $response->say('users: ', keys %users);
+     $tx->res->say('users: ', keys %users);
    }
    else
    {
      # respond if user exists
-     if(defined $users{$request->username})
+     if(defined $users{$tx->req->username})
      {
-       $response->say($users{$request});
+       $tx->res->say($users{$request});
      }
      # respond if user does not exist
      else
      {
-       $response->say('no such user');
+       $tx->res->say('no such user');
      }
    }
-   $response->done;
+   $tx->res->done;
  };
 
 =head1 FUNCTIONS
