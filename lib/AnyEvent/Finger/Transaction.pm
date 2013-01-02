@@ -38,4 +38,12 @@ Returns the local TCP port being used to make the request.
 sub remote_port { shift->{remote_port} }
 sub local_port { shift->{local_port} }
 
+=head2 $tx-E<gt>remote_address
+
+Returns the IP address from whence the finger request is coming from.
+
+=cut
+
+sub remote_address { shift->{remote_address} }
+
 1;

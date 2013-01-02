@@ -187,10 +187,11 @@ sub start
       my $req = AnyEvent::Finger::Request->new($line);
       
       my $tx = bless { 
-        req         => $req, 
-        res         => $res,
-        remote_port => $port,
-        local_port  => $self->{bindport},
+        req            => $req, 
+        res            => $res,
+        remote_port    => $port,
+        local_port     => $self->{bindport},
+        remote_address => $host,
       }, 'AnyEvent::Finger::Transaction';
 
       $callback->($tx);
