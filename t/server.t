@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 11;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
@@ -18,6 +18,14 @@ eval { $server->start(
     my $tx = shift;
     my $req = $tx->req;
     $tx->res->say("request = '$req'");
+    eval {
+      $tx->res->say($tx->remote_port);
+    };
+    diag $@ if $@;
+    eval {
+      $tx->res->say($tx->local_port);
+    };
+    diag $@ if $@;
     $tx->res->done;
   }
 ) };
@@ -40,6 +48,8 @@ do {
   $done->recv;
   
   is $lines->[0], "request = ''", 'response is correct';
+  like $lines->[1], qr/^[1-9]\d*$/, "remote_port = " . $lines->[1];
+  is $lines->[2], $port, "local_port = " . $port;
 };
 
 do {

@@ -186,7 +186,12 @@ sub start
       bless $res, 'AnyEvent::Finger::Response';
       my $req = AnyEvent::Finger::Request->new($line);
       
-      my $tx = bless { req => $req, res => $res }, 'AnyEvent::Finger::Transaction';
+      my $tx = bless { 
+        req         => $req, 
+        res         => $res,
+        remote_port => $port,
+        local_port  => $self->{bindport},
+      }, 'AnyEvent::Finger::Transaction';
 
       $callback->($tx);
     });
