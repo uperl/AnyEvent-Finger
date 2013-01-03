@@ -17,7 +17,9 @@ use Carp qw( carp );
  
  my $done = AnyEvent->condvar;
  
- my $client = AnyEvent::Finger::Client->new;
+ my $client = AnyEvent::Finger::Client->new( 
+   hostname => 'localhost',
+ );
  
  $client->finger('username', sub {
    my($lines) = @_;
