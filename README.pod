@@ -75,6 +75,7 @@ L<AnyEvent::Finger::Server> as root is not recommended.
 
 =head1 SEE ALSO
 
+L<RFC1288|http://tools.ietf.org/html/rfc1288>,
 L<AnyEvent::Finger::Client>,
 L<AnyEvent::Finger::Server>
 

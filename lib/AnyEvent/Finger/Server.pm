@@ -24,30 +24,30 @@ use AnyEvent::Finger::Response;
    optimus  => "Freedom is the right of all sentient beings.",
  );
  
- $server->start(
-   my($request, $response) = @_;
-   if($request->listing_request)
+ $server->start(sub {
+   my($tx) = @_;
+   if($tx->req->listing_request)
    {
      # respond if remote requests list of users
-     $response->say('users:', keys %users);
-     $response->done;
+     $tx->res->say('users:', keys %users);
+     $tx->res->done;
    }
    else
    {
      # respond if user exists
-     if(defined $users{$request->username})
+     if(defined $users{$tx->req->username})
      {
-       $response->say($users{$request->username});
-       $response->done;
+       $tx->res->say($users{$tx->req->username});
+       $tx->res->done;
      }
      # respond if user does not exist
      else
      {
-       $response->say('no such user');
-       $response->done;
+       $tx->res->say('no such user');
+       $tx->res->done;
      }
    }
- );
+ });
 
 =head1 DESCRIPTION
 
