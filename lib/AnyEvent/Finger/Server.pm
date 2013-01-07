@@ -3,7 +3,7 @@ package AnyEvent::Finger::Server;
 use strict;
 use warnings;
 use v5.10;
-use Carp qw( croak );
+use Carp qw( carp croak );
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket qw( tcp_server );
