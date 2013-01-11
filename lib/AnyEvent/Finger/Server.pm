@@ -78,6 +78,12 @@ on_error (carp error)
 A callback subref to be called on error (either connection or transmission error).
 Passes the error string as the first argument to the callback.
 
+=item *
+
+forward_deny (0)
+
+Deny forward requests, ie C<finger@host1@host2@...> style requests.
+
 =back
 
 =cut
@@ -87,9 +93,10 @@ sub new
   my $class = shift;
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
   bless {
-    hostname => $args->{hostname},  
-    port     => $args->{port}     // 79,
-    on_error => $args->{on_error} // sub { carp $_[0] },
+    hostname     => $args->{hostname},  
+    port         => $args->{port}     // 79,
+    on_error     => $args->{on_error} // sub { carp $_[0] },
+    forward_deny => $args->{forward_deny} // 0,
   }, $class;
 }
 
@@ -144,7 +151,7 @@ sub start
   croak "already started" if $self->{guard};
 
   $args->{$_} //= $self->{$_}
-    for qw( hostname port on_error );
+    for qw( hostname port on_error forward_deny );
 
   my $cb = sub {
     my ($fh, $host, $port) = @_;
@@ -193,6 +200,13 @@ sub start
         local_port     => $self->{bindport},
         remote_address => $host,
       }, 'AnyEvent::Finger::Transaction';
+      
+      if($args->{forward_deny} && @{ $tx->req->hostnames } > 0)
+      {
+        $tx->res->say('finger forwarding service denied');
+        $tx->res->done;
+        return;
+      }
 
       $callback->($tx);
     });
