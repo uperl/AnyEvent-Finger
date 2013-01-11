@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 15;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
@@ -12,6 +12,8 @@ my $server1 = AnyEvent::Finger::Server->new(
 $server1->start(sub {
   my $tx = shift;
   $tx->res->say('server1');
+  $tx->res->say('username = ' . $tx->req->username);
+  $tx->res->say('verbose  = ' . $tx->req->verbose);
   $tx->res->done;
 });
 
@@ -58,7 +60,7 @@ do {
   my $done = AnyEvent->condvar;
 
   my $lines;
-  $client2->finger('@127.0.0.1', sub {
+  $client2->finger('@localhost', sub {
     ($lines) = shift;
     $done->send;
   });
@@ -66,13 +68,14 @@ do {
   $done->recv;
   
   is $lines->[0], 'server1', 'lines[0] == server2';
+  is $lines->[1], 'username = ', 'username = ';
 };
 
 do {
   my $done = AnyEvent->condvar;
 
   my $lines;
-  $client2->finger('@127.0.0.1@127.0.0.1', sub {
+  $client2->finger('@localhost@localhost', sub {
     ($lines) = shift;
     $done->send;
   });
@@ -80,4 +83,52 @@ do {
   $done->recv;
   
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
+};
+
+do {
+  my $done = AnyEvent->condvar;
+
+  my $lines;
+  $client2->finger('foo@localhost', sub {
+    ($lines) = shift;
+    $done->send;
+  });
+  
+  $done->recv;
+  
+  is $lines->[0], 'server1', 'lines[0] == server2';
+  is $lines->[1], 'username = foo', 'username = foo';
+  is $lines->[2], 'verbose  = 0', 'verbose = 0';
+};
+
+do {
+  my $done = AnyEvent->condvar;
+
+  my $lines;
+  $client2->finger('/W foo@localhost', sub {
+    ($lines) = shift;
+    $done->send;
+  });
+  
+  $done->recv;
+  
+  is $lines->[0], 'server1', 'lines[0] == server2';
+  is $lines->[1], 'username = foo', 'username = foo';
+  is $lines->[2], 'verbose  = 1', 'verbose = 1';
+};
+
+do {
+  my $done = AnyEvent->condvar;
+
+  my $lines;
+  $client2->finger('/W @localhost', sub {
+    ($lines) = shift;
+    $done->send;
+  });
+  
+  $done->recv;
+  
+  is $lines->[0], 'server1', 'lines[0] == server2';
+  is $lines->[1], 'username = ', 'username = ';
+  is $lines->[2], 'verbose  = 1', 'verbose = 1';
 };
