@@ -82,7 +82,18 @@ Passes the error string as the first argument to the callback.
 
 forward_deny (0)
 
-Deny forward requests, ie C<finger@host1@host2@...> style requests.
+Deny forward requests, (for example: C<finger@host1@host2@...> style requests).  
+If neither C<forward_deny> or C<forward> is specified then forward requests will 
+be passed on to the callback, like all other requests.
+
+=item *
+
+forward (0)
+
+Forward forward requests.  This can be set to either 1, or an instance of
+L<AnyEvent::Finger::Client> which will be used to forward requests.  If neither
+C<forward_deny> or C<forward> is specified then forward requests will be passed
+on to the callback, like all other requests.
 
 =back
 
@@ -97,6 +108,7 @@ sub new
     port         => $args->{port}     // 79,
     on_error     => $args->{on_error} // sub { carp $_[0] },
     forward_deny => $args->{forward_deny} // 0,
+    forward      => $args->{forward} // 0,
   }, $class;
 }
 
@@ -151,8 +163,18 @@ sub start
   croak "already started" if $self->{guard};
 
   $args->{$_} //= $self->{$_}
-    for qw( hostname port on_error forward_deny );
+    for qw( hostname port on_error forward forward_deny );
 
+  my $forward = $args->{forward} // $self->{forward};
+  if($forward)
+  {
+    unless(ref $forward)
+    {
+      require AnyEvent::Finger::Client;
+      $args->{forward} = AnyEvent::Finger::Client->new;
+    }
+  }
+    
   my $cb = sub {
     my ($fh, $host, $port) = @_;
 
@@ -201,10 +223,23 @@ sub start
         remote_address => $host,
       }, 'AnyEvent::Finger::Transaction';
       
-      if($args->{forward_deny} && @{ $tx->req->hostnames } > 0)
+      if($args->{forward_deny} && $tx->req->forward_request)
       {
-        $tx->res->say('finger forwarding service denied');
-        $tx->res->done;
+        $res->(['finger forwarding service denied', undef]);
+        return;
+      }
+      
+      if($forward && $req->forward_request)
+      {
+      
+        my $host = pop @{ $req->hostnames };
+        my $new_request = join '@', $req->username, @{ $req->hostnames };
+        $new_request = '/W ' . $new_request if $req->verbose;
+        $forward->finger($new_request, sub {
+          my $lines = shift;
+          push @$lines, undef;
+          $res->($lines);
+        }, { hostname => $host });
         return;
       }
 
