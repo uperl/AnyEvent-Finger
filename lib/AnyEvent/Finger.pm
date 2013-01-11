@@ -107,6 +107,16 @@ Most finger clients do not have a way to configure an alternate port.
 Binding to the default port 79 on Unix usually requires root.  Running 
 L<AnyEvent::Finger::Server> as root is not recommended.
 
+Under Linux you can use C<iptables> to forward requests to port 79 to
+an unprivileged port.  I was able to use this incantation to forward port 79
+to port 8079:
+
+ # iptables -t nat -A PREROUTING -p tcp --dport 79 -j REDIRECT --to-port 8079
+ # iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 79 -j REDIRECT --to-port 8079
+
+The first rule is sufficient for external clients, the second rule was required
+for clients connecting via the loopback interface (localhost).
+
 =head1 SEE ALSO
 
 L<RFC1288|http://tools.ietf.org/html/rfc1288>,

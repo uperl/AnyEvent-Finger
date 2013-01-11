@@ -18,7 +18,7 @@ $server->start(
     my $tx = shift;
     if($tx->req->listing_request)
     {
-      $tx->res->send_lines('list of sers:', '', '- grimlock');
+      $tx->res->say('list of sers:', '', '- grimlock');
     }
     else
     {
