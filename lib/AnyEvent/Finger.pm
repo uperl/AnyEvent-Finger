@@ -33,7 +33,7 @@ server:
  );
  
  finger_server sub {
-   my $tx = shift;
+   my $tx = shift; # isa AnyEvent::Finger::Transaction
    if($tx->req->listing_request)
    {
      # respond if remote requests list of users
@@ -52,6 +52,8 @@ server:
        $tx->res->say('no such user');
      }
    }
+   # required! done generating the reply,
+   # close the connection with the client.
    $tx->res->done;
  };
 

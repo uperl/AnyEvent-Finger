@@ -30,7 +30,6 @@ use AnyEvent::Finger::Response;
    {
      # respond if remote requests list of users
      $tx->res->say('users:', keys %users);
-     $tx->res->done;
    }
    else
    {
@@ -38,15 +37,16 @@ use AnyEvent::Finger::Response;
      if(defined $users{$tx->req->username})
      {
        $tx->res->say($users{$tx->req->username});
-       $tx->res->done;
      }
      # respond if user does not exist
      else
      {
        $tx->res->say('no such user');
-       $tx->res->done;
      }
    }
+   # required! done generating the reply,
+   # close the connection with the client.
+   $tx->res->done;
  });
 
 =head1 DESCRIPTION
