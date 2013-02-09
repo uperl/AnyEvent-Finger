@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - minor inheritence tweak
 
 0.03      2013-02-09 09:22:11 America/New_York
   - pass $server object into on_bind first argument

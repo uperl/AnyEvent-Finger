@@ -3,8 +3,8 @@ package AnyEvent::Finger;
 use strict;
 use warnings;
 use v5.10;
-BEGIN { our @ISA; push @ISA, 'Exporter' }
 
+our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( finger_client finger_server );
 
 # ABSTRACT: Simple asynchronous finger client and server
