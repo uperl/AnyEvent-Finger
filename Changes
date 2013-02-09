@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - pass $server object into on_bind first argument
 
 0.02      2013-02-09 09:13:27 America/New_York
   - create on_bind callback on server for when port # is not known in advance
