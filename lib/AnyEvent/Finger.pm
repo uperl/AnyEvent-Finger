@@ -3,7 +3,7 @@ package AnyEvent::Finger;
 use strict;
 use warnings;
 use v5.10;
-use base qw( Exporter );
+BEGIN { our @ISA; push @ISA, 'Exporter' }
 
 our @EXPORT_OK = qw( finger_client finger_server );
 

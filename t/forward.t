@@ -4,11 +4,15 @@ use Test::More tests => 15;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
+my $bind = AnyEvent->condvar;
+
 my $server1 = AnyEvent::Finger::Server->new(
   port         => 0,
   hostname     => '127.0.0.1',
   forward_deny => 1,
+  on_bind      => sub { $bind->send },
 );
+
 $server1->start(sub {
   my $tx = shift;
   $tx->res->say('server1');
@@ -17,6 +21,7 @@ $server1->start(sub {
   $tx->res->done;
 });
 
+$bind->recv;
 like $server1->bindport, qr{^[1-9]\d*$}, "server1->bindport = " . $server1->bindport;
 
 my $client1 = AnyEvent::Finger::Client->new(
@@ -24,10 +29,12 @@ my $client1 = AnyEvent::Finger::Client->new(
   on_error => sub { say STDERR shift; exit 2 },
 );
 
+$bind = AnyEvent->condvar;
 my $server2 = AnyEvent::Finger::Server->new(
   port     => 0,
   hostname => '127.0.0.1',
   forward  => $client1,
+  on_bind  => sub { $bind->send },
 );
 $server2->start(sub {
   my $tx = shift;

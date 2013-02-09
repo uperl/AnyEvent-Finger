@@ -4,11 +4,13 @@ use Test::More tests => 6;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
+my $bind = AnyEvent->condvar;
 my $server = eval { 
   AnyEvent::Finger::Server->new( 
     port         => 0, 
     hostname     => '127.0.0.1',
     forward_deny => 1,
+    on_bind      => sub { $bind->send },
   );
 };
 diag $@ if $@;
@@ -23,6 +25,7 @@ eval { $server->start(
 ) };
 diag $@ if $@;
 
+$bind->recv;
 my $port = $server->bindport;
 like $port, qr{^[123456789]\d*$}, "bindport = $port";
 

@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - create on_bind callback on server for when port # is not known in advance
+  - don't use Condvar#recv from AnyEvent::Finger::Server as it may not be
+    supported by the AnyEvent implementation
 
 0.01      2013-01-22 10:50:03 America/New_York
   - initial version

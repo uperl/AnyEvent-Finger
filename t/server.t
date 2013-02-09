@@ -4,29 +4,36 @@ use Test::More tests => 12;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
+my $bind;
+
 my $server = eval { 
   AnyEvent::Finger::Server->new( 
     port     => 0, 
     hostname => '127.0.0.1',
+    on_bind  => sub { $bind->send },
   );
 };
 diag $@ if $@;
 isa_ok $server, 'AnyEvent::Finger::Server';
 
-eval { $server->start(
-  sub {
-    my $tx = shift;
-    my $req = $tx->req;
-    eval {
-      $tx->res->say("request = '$req'");
-      $tx->res->say($tx->remote_port);
-      $tx->res->say($tx->local_port);
-      $tx->res->say($tx->remote_address);
-    };
-    diag $@ if $@;
-    $tx->res->done;
-  }
-) };
+eval { 
+  $bind = AnyEvent->condvar;
+  $server->start(
+    sub {
+      my $tx = shift;
+      my $req = $tx->req;
+      eval {
+        $tx->res->say("request = '$req'");
+        $tx->res->say($tx->remote_port);
+        $tx->res->say($tx->local_port);
+        $tx->res->say($tx->remote_address);
+      };
+      diag $@ if $@;
+      $tx->res->done;
+    }
+  );
+  $bind->recv;
+};
 diag $@ if $@;
 
 my $port = $server->bindport;
@@ -67,6 +74,7 @@ do {
 
 eval {
   $server->stop;
+  $bind = AnyEvent->condvar;
   $server->start(sub {
     my $tx = shift;
     $tx->res->say(
@@ -77,6 +85,7 @@ eval {
     );
     $tx->res->done;
   });
+  $bind->recv;
 };
 diag $@ if $@;
 

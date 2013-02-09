@@ -1,10 +1,17 @@
 use strict;
 use warnings;
+use v5.10;
 use Test::More tests => 3;
 use AnyEvent;
 use AnyEvent::Finger qw( finger_server finger_client );
 
+our $timeout = AnyEvent->timer( 
+  after => 15, 
+  cb    => sub { say STDERR "TIMEOUT"; exit },
+);
+
 my $port = eval { 
+  my $bind = AnyEvent->condvar;
   my $server = finger_server sub {
     my $tx = shift;
     my $req = $tx->req;
@@ -12,7 +19,8 @@ my $port = eval {
       "request = '$req'",
       undef,
     ]);
-  }, { port => 0, hostname => '127.0.0.1' };
+  }, { port => 0, hostname => '127.0.0.1', on_bind => sub { $bind->send } };
+  $bind->recv;
   $server->bindport;
 };
 diag $@ if $@;
