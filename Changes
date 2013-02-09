@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.04      2013-02-09 17:00:20 America/New_York
   - minor inheritence tweak
 
 0.03      2013-02-09 09:22:11 America/New_York
