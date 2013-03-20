@@ -8,9 +8,19 @@ use overload '""' => sub { shift->as_string };
 # ABSTRACT: Simple asynchronous finger request
 # VERSION
 
+=head1 SYNOPSIS
+
+ my $request = AnyEvent::Finger::Request->new('foo@localhost');
+
+=head1 DESCRIPTION
+
+This class represents finger request.  It is passed into
+L<AnyEvent::Finger::Server> when a finger request is made.
+See the documentation on that class for more details.
+
 =head1 CONSTRUCTOR
 
- my $request = AnyEvent::Finger::Request->new("foo@localhost");
+=head2 AnyEvent::Finger::Request->new( $address )
 
 The constructor takes a string which is the raw finger request.
 

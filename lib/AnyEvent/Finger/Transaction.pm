@@ -8,6 +8,14 @@ use overload '""' => sub { shift->as_string };
 # ABSTRACT: Simple asynchronous finger transaction
 # VERSION
 
+=head1 DESCRIPTION
+
+This class is a container for response and request objects
+which is used when a finger request comes into 
+L<AnyEvent::Finger::Server> server instance.  It also provides
+information about the connection (the remote, local ports and
+the remote client's address).
+
 =head1 METHODS
 
 =head2 $tx-E<gt>req

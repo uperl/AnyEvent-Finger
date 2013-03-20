@@ -7,6 +7,12 @@ use v5.10;
 # ABSTRACT: Simple asynchronous finger response
 # VERSION
 
+=head1 DESCRIPTION
+
+This class provides an interface for constructing a response
+from a finger server for L<AnyEvent::Finger::Server>.  See
+the documentation on that class for more details.
+
 =head1 METHODS
 
 =head2 $response-E<gt>say( @lines )
