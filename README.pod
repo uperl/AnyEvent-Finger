@@ -54,6 +54,13 @@ server:
    $tx->res->done;
  };
 
+=head1 DESCRIPTION
+
+This distribution provides an asynchronous finger server and 
+client which can be used by any event loop supported by 
+L<AnyEvent>.  This specific module provides a simple procedural
+interface to client and server classes also in this distribution.
+
 =head1 FUNCTIONS
 
 =head2 finger_client( $server, $request, $callback, [ \%options ] )
