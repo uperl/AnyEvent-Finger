@@ -1,6 +1,9 @@
 language: perl
 install:
-  - cpanm -n AnyEvent
+  - cpanm -n AnyEvent Test::CPAN::Changes Test::EOL Test::NoTab Test::Pod::Spelling::CommonMistakes
 script: HARNESS_IS_VERBOSE=1 prove -lvr t xt
 perl:
   - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
