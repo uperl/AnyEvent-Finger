@@ -31,7 +31,7 @@ like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
 my $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say STDERR shift; exit 2 } );
 
-do {
+subtest "finger" => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -46,7 +46,7 @@ do {
 };
 
 
-do {
+subtest "finger \@localhost" => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -60,7 +60,7 @@ do {
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
-do {
+subtest "finger foo\@localhost" => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -74,7 +74,7 @@ do {
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
-do {
+subtest "finger foo\@bar\@baz\@whatever\@loalhost" => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;

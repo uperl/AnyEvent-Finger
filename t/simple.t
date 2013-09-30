@@ -29,7 +29,7 @@ like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
 my $error = sub { say STDERR shift; exit 2 };
 
-do {
+subtest t1 => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -43,7 +43,7 @@ do {
   is $lines->[0], "request = ''", 'response is correct';
 };
 
-do {
+subtest t2 => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 6;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
@@ -41,7 +41,7 @@ like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
 my $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say STDERR shift; exit 2 } );
 
-do {
+subtest t1 => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -58,7 +58,7 @@ do {
   is $lines->[3], '127.0.0.1', 'remote_address = 127.0.0.1';
 };
 
-do {
+subtest t2 => sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -93,7 +93,7 @@ $port = $server->bindport;
 like $port, qr{^[123456789]\d*$}, "bindport = $port";
 $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say STDERR shift; exit 2 } );
 
-do {
+subtest t3 => sub {
   my $done = AnyEvent->condvar;
   
   my $lines;

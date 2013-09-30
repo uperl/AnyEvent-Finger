@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 8;
 use AnyEvent::Finger::Request;
 
-do {
+subtest t1 => sub {
 
   my $raw = 'grimlock';
   is $raw, $raw, "[$raw]";
@@ -22,7 +22,7 @@ do {
 
 };
 
-do {
+subtest t2 => sub {
 
   my $raw = '/W grimlock';
   is $raw, $raw, "[$raw]";
@@ -41,7 +41,7 @@ do {
 
 };
 
-do {
+subtest t3 => sub {
 
   my $raw = 'grimlock@localhost';
   is $raw, $raw, "[$raw]";
@@ -60,7 +60,7 @@ do {
 
 };
 
-do {
+subtest t4 => sub {
 
   my $raw = '/W grimlock@localhost';
   is $raw, $raw, "[$raw]";
@@ -79,7 +79,7 @@ do {
 
 };
 
-do {
+subtest t5 => sub {
 
   my $raw = 'grimlock@localhost@foo@bar@baz';
   is $raw, $raw, "[$raw]";
@@ -98,7 +98,7 @@ do {
 
 };
 
-do {
+subtest t6 => sub {
 
   my $raw = '/W grimlock@localhost@foo@bar@baz';
   is $raw, $raw, "[$raw]";
@@ -117,7 +117,7 @@ do {
 
 };
 
-do {
+subtest t7 => sub {
 
   my $raw = '';
   is $raw, $raw, "[$raw]";
@@ -135,7 +135,7 @@ do {
   is_deeply $request->hostnames, [], 'hostnames = []';
 };
 
-do {
+subtest t8 => sub {
 
   my $raw = '/W';
   is $raw, $raw, "[$raw]";

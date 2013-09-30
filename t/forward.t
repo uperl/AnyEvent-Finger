@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 8;
 use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
@@ -49,7 +49,7 @@ my $client2 = AnyEvent::Finger::Client->new(
   on_error => sub { say STDERR shift; exit 2 },
 );
 
-do {
+subtest 'finger', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -63,7 +63,7 @@ do {
   is $lines->[0], 'server2', 'lines[0] == server2';
 };
 
-do {
+subtest 'finger @localhost', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -78,7 +78,7 @@ do {
   is $lines->[1], 'username = ', 'username = ';
 };
 
-do {
+subtest 'finger @localhost@localhost', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -92,7 +92,7 @@ do {
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
-do {
+subtest 'finger foo@localhost', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -108,7 +108,7 @@ do {
   is $lines->[2], 'verbose  = 0', 'verbose = 0';
 };
 
-do {
+subtest 'finger /W foo@localhost', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
@@ -124,7 +124,7 @@ do {
   is $lines->[2], 'verbose  = 1', 'verbose = 1';
 };
 
-do {
+subtest 'finger /W @localhost', sub {
   my $done = AnyEvent->condvar;
 
   my $lines;
