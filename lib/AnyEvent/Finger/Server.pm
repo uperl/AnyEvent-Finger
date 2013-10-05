@@ -1,4 +1,4 @@
-package AnyEvent::Finger::Server;
+package AnyEvent::Finger;
 
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use AnyEvent::Socket qw( tcp_server );
 use AnyEvent::Finger::Transaction;
 use AnyEvent::Finger::Request;
 use AnyEvent::Finger::Response;
+use mop;
 
 # ABSTRACT: Simple asynchronous finger server
 # VERSION
@@ -108,19 +109,15 @@ on to the callback, like all other requests.
 
 =cut
 
-sub new
+class Server
 {
-  my $class = shift;
-  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
-  bless {
-    hostname     => $args->{hostname},  
-    port         => $args->{port}         // 79,
-    on_error     => $args->{on_error}     // sub { carp $_[0] },
-    on_bind      => $args->{on_bind}      // sub { },
-    forward_deny => $args->{forward_deny} // 0,
-    forward      => $args->{forward}      // 0,
-  }, $class;
-}
+  has $!hostname;
+  has $!port         = 79;
+  has $!on_error     = sub { car $_[0] };
+  has $!on_bind      = sub { };
+  has $!forward_deny = 0;
+  has $!forward      = 0;
+  has $!bindport is ro;
 
 =head1 METHODS
 
@@ -164,110 +161,111 @@ is called.
  
 =cut
 
-sub start
-{
-  my $self     = shift;
-  my $callback = shift;
-  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
+  has $!guard;
 
-  croak "already started" if $self->{guard};
-
-  $args->{$_} //= $self->{$_}
-    for qw( hostname port on_error on_bind forward forward_deny );
-
-  my $forward = $args->{forward} // $self->{forward};
-  if($forward)
+  method start($callback, @args)
   {
-    unless(ref $forward)
+    my $args     = ref $args[0] eq 'HASH' ? (\%{$args[0]}) : ({@args});
+
+    croak "already started" if $!guard;
+
+    my $hostname = $args->{hostname} // $!hostname;
+    my $port     = $args->{port}     // $!port;
+    my $on_error = $args->{on_error} // $!on_error;
+    my $on_bind  = $args->{on_bind}  // $!on_bind;
+    my $forward  = $args->{forward}  // $!forward;
+    my $forward_deny = $args->{forward_deny} // $!forward_deny;
+
+    if($forward)
     {
-      require AnyEvent::Finger::Client;
-      $args->{forward} = AnyEvent::Finger::Client->new;
+      unless(ref $forward)
+      {
+        require AnyEvent::Finger::Client;
+        $forward = AnyEvent::Finger::Client->new;
+      }
     }
-  }
     
-  my $cb = sub {
-    my ($fh, $host, $port) = @_;
+    my $cb = sub {
+      my ($fh, $host, $port) = @_;
 
-    my $handle;
-    $handle = AnyEvent::Handle->new(
-      fh       => $fh,
-      on_error => sub {
-        my ($hdl, $fatal, $msg) = @_;
-        $args->{on_error}->($msg);
-        $_[0]->destroy;
-      },
-      on_eof   => sub {
-        $handle->destroy;
-      },
-    );
-
-    $handle->push_read( line => sub {
-      my($handle, $line) = @_;
-      $line =~ s/\015?\012//g;
-
-      my $res = sub {
-        my $lines = shift;
-        $lines = [ $lines ] unless ref $lines eq 'ARRAY';
-        foreach my $line (@$lines)
-        {
-          if(defined $line)
-          {
-            $handle->push_write($line . "\015\012");
-          }
-          else
-          {
-            $handle->destroy;
-            return;
-          }
-        }
-      };
-
-      bless $res, 'AnyEvent::Finger::Response';
-      my $req = AnyEvent::Finger::Request->new($line);
-      
-      my $tx = AnyEvent::Finger::Transaction->new(
-        req            => $req, 
-        res            => $res,
-        remote_port    => $port,
-        local_port     => $self->{bindport},
-        remote_address => $host,
+      my $handle;
+      $handle = AnyEvent::Handle->new(
+        fh       => $fh,
+        on_error => sub {
+          my ($hdl, $fatal, $msg) = @_;
+          $!on_error->($msg);
+          $_[0]->destroy;
+        },
+        on_eof   => sub {
+          $handle->destroy;
+        },
       );
-      
-      if($args->{forward_deny} && $tx->req->forward_request)
-      {
-        $res->(['finger forwarding service denied', undef]);
-        return;
-      }
-      
-      if($forward && $req->forward_request)
-      {
-      
-        my $host = pop @{ $req->hostnames };
-        my $new_request = join '@', $req->username, @{ $req->hostnames };
-        $new_request = '/W ' . $new_request if $req->verbose;
-        $forward->finger($new_request, sub {
-          my $lines = shift;
-          push @$lines, undef;
-          $res->($lines);
-        }, { hostname => $host });
-        return;
-      }
 
-      $callback->($tx);
-    });
-  };
+      $handle->push_read( line => sub {
+        my($handle, $line) = @_;
+        $line =~ s/\015?\012//g;
+
+        my $res = sub {
+          my $lines = shift;
+          $lines = [ $lines ] unless ref $lines eq 'ARRAY';
+          foreach my $line (@$lines)
+          {
+            if(defined $line)
+            {
+              $handle->push_write($line . "\015\012");
+            }
+            else
+            {
+              $handle->destroy;
+              return;
+            }
+          }
+        };
+
+        bless $res, 'AnyEvent::Finger::Response';
+        my $req = AnyEvent::Finger::Request->new($line);
+      
+        my $tx = AnyEvent::Finger::Transaction->new(
+          req            => $req, 
+          res            => $res,
+          remote_port    => $port,
+          local_port     => $!bindport,
+          remote_address => $host,
+        );
+      
+        if($forward_deny && $tx->req->forward_request)
+        {
+          $res->(['finger forwarding service denied', undef]);
+          return;
+        }
+      
+        if($forward && $req->forward_request)
+        {
+          my $host = pop @{ $req->hostnames };
+          my $new_request = join '@', $req->username, @{ $req->hostnames };
+          $new_request = '/W ' . $new_request if $req->verbose;
+          $forward->finger($new_request, sub {
+            my $lines = shift;
+            push @$lines, undef;
+            $res->($lines);
+          }, { hostname => $host });
+          return;
+        }
+
+        $callback->($tx);
+      });
+    };
   
-  my $port = $args->{port};
-  undef $port if $port == 0;
+    undef $port if $port == 0;
   
-  $self->{guard} = tcp_server $args->{hostname}, $port, $cb, sub {
-    my($fh, $host, $port) = @_;
-    $self->{bindport} = $port;
-    $args->{on_bind}->($self);
-  };
+    $!guard = tcp_server $!hostname, $port, $cb, sub {
+      my($fh, $host, $port) = @_;
+      $!bindport = $port;
+      $!on_bind->($self);
+    };
   
-  $self;
-}
+    $self;
+  }
 
 =head2 $server-E<gt>bindport
 
@@ -278,22 +276,19 @@ has been allocated and bound to a port, so if you need this
 value after calling C<start> but before any clients have connected
 use the C<on_bind> callback.
 
-=cut
-
-sub bindport { shift->{bindport} }
-
 =head2 $server-E<gt>stop
 
 Stop the server and unbind to the port.
 
 =cut
 
-sub stop
-{
-  my($self) = @_;
-  delete $self->{guard};
-  delete $self->{bindport};
-  $self;
+  method stop
+  {
+    undef $!guard;
+    undef $!bindport;
+    $self;
+  }
+
 }
 
 1;
