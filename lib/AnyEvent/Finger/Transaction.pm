@@ -1,9 +1,9 @@
-package AnyEvent::Finger::Transaction;
+package AnyEvent::Finger;
 
 use strict;
 use warnings;
 use v5.10;
-use overload '""' => sub { shift->as_string };
+use mop;
 
 # ABSTRACT: Simple asynchronous finger transaction
 # VERSION
@@ -30,8 +30,11 @@ Returns the response object associated with the transaction
 
 =cut
 
-sub res { shift->{res} }
-sub req { shift->{req} }
+class Transaction
+{
+
+  has $!res is ro;
+  has $!req is ro;
 
 =head2 $tx-E<gt>remote_port
 
@@ -43,8 +46,8 @@ Returns the local TCP port being used to make the request.
 
 =cut
 
-sub remote_port { shift->{remote_port} }
-sub local_port { shift->{local_port} }
+  has $!remote_port is ro;
+  has $!local_port is ro;
 
 =head2 $tx-E<gt>remote_address
 
@@ -52,6 +55,8 @@ Returns the IP address from whence the finger request is coming from.
 
 =cut
 
-sub remote_address { shift->{remote_address} }
+  has $!remote_address is ro;
+
+}
 
 1;

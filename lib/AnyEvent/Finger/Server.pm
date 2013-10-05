@@ -225,13 +225,13 @@ sub start
       bless $res, 'AnyEvent::Finger::Response';
       my $req = AnyEvent::Finger::Request->new($line);
       
-      my $tx = bless { 
+      my $tx = AnyEvent::Finger::Transaction->new(
         req            => $req, 
         res            => $res,
         remote_port    => $port,
         local_port     => $self->{bindport},
         remote_address => $host,
-      }, 'AnyEvent::Finger::Transaction';
+      );
       
       if($args->{forward_deny} && $tx->req->forward_request)
       {
