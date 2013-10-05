@@ -121,7 +121,7 @@ may be overridden specifying them in the options hash (third argument).
       );
     
       if(ref $request && $request->isa('AnyEvent::Finger::Request'))
-      { $request = $request->{raw} }
+      { $request = $request->_raw }
       $handle->push_write("$request\015\012");
     
       $handle->on_read(sub {

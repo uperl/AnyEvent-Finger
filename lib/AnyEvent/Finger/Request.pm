@@ -1,9 +1,9 @@
-package AnyEvent::Finger::Request;
+package AnyEvent::Finger;
 
 use strict;
 use warnings;
 use v5.10;
-use overload '""' => sub { shift->as_string };
+use mop;
 
 # ABSTRACT: Simple asynchronous finger request
 # VERSION
@@ -26,10 +26,17 @@ The constructor takes a string which is the raw finger request.
 
 =cut
 
-sub new
+class Request
 {
-  bless { raw => "$_[1]" // '' }, $_[0];
-}
+
+  has $!raw;
+  
+  method new($class: $raw)
+  {
+    $class->next::method( raw => $raw );
+  }
+  
+  method _raw { $!raw }
 
 =head1 ATTRIBUTES
 
@@ -40,11 +47,12 @@ if request is not asking for a verbose response.
 
 =cut
 
-sub verbose
-{
-  my($self) = @_;
-  $self->{verbose} //= ($self->{raw} =~ /^\/W/ ? 1 : 0);
-}
+  has $!verbose;
+
+  method verbose
+  {
+    $!verbose //= ($!raw =~ /^\/W/ ? 1 : 0);
+  }
 
 =head2 $request-E<gt>username
 
@@ -52,18 +60,18 @@ The username being requested.
 
 =cut
 
-sub username
-{
-  my($self) = @_;
+  has $!username;
   
-  unless(defined $self->{username})
+  method username
   {
-    if($self->{raw} =~ /^(?:\/W\s*)?([^@]*)/)
-    { $self->{username} = $1 }
-  }
+    unless(defined $!username)
+    {
+      if($!raw =~ /^(?:\/W\s*)?([^@]*)/)
+      { $!username = $1 }
+    }
   
-  $self->{username};
-}
+    $!username;
+  }
 
 =head2 $request-E<gt>hostnames
 
@@ -71,11 +79,13 @@ Returns a list of hostnames (as an array ref) in the request.
 
 =cut
 
-sub hostnames
-{
-  my($self) = @_;
-  $self->{hostnames} //= ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
-}
+  has $!hostnames;
+
+  method hostnames
+  {
+    say $!raw;
+    $!hostnames //= ($!raw =~ /\@(.*)$/ ? [split '@', $1] : []);
+  }
 
 =head2 $request-E<gt>as_string
 
@@ -83,11 +93,10 @@ Converts just the username and hostnames fields into a string.
 
 =cut
 
-sub as_string
-{
-  my($self) = @_;
-  join('@', ($self->username, @{ $self->hostnames }));
-}
+  method as_string is overload(q[""])
+  {
+    join('@', ($self->username, @{ $self->hostnames }));
+  }
 
 =head2 $request-E<gt>listing_request
 
@@ -95,7 +104,7 @@ Return true if the request is for a listing of users.
 
 =cut
 
-sub listing_request { shift->username eq '' ? 1 : 0 }
+  method listing_request { $self->username eq '' ? 1 : 0 }
 
 
 =head2 $request-E<gt>forward_request
@@ -104,6 +113,8 @@ Return true if the request is to query another host.
 
 =cut
 
-sub forward_request { @{ shift->hostnames } > 0 ? 1 : 0}
+  method forward_request { @{ $self->hostnames } > 0 ? 1 : 0}
+
+}
 
 1;
