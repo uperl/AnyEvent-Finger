@@ -1,6 +1,8 @@
 language: perl
 install:
   - cpanm -n AnyEvent Test::CPAN::Changes Test::EOL Test::NoTabs Test::Pod::Spelling::CommonMistakes
+  - cpanm https://github.com/stevan/p5-mop-redux.git
+  - cpanm https://github.com/rafl/twigils.git
 script: HARNESS_IS_VERBOSE=1 prove -lvr t xt
 perl:
   - "5.19"
