@@ -1,4 +1,4 @@
-package AnyEvent::Finger::Client;
+package AnyEvent::Finger;
 
 use strict;
 use warnings;
@@ -6,6 +6,7 @@ use v5.10;
 use AnyEvent::Socket qw( tcp_connect );
 use AnyEvent::Handle;
 use Carp qw( carp );
+use mop;
 
 # ABSTRACT: Simple asynchronous finger client
 # VERSION
@@ -68,17 +69,12 @@ Passes the error string as the first argument to the callback.
 
 =cut
 
-sub new
+class Client
 {
-  my $class = shift;
-  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
-  bless { 
-    hostname => $args->{hostname} // '127.0.0.1',  
-    port     => $args->{port}     // 79,
-    timeout  => $args->{timeout}  // 60,
-    on_error => $args->{on_error} // sub { carp $_[0] },
-  }, $class;
-}
+  has $!hostname = '127.0.0.1';
+  has $!port     = 79;
+  has $!timeout  = 60;
+  has $!on_error = sub { carp $_[0] };
 
 =head1 METHODS
 
@@ -92,52 +88,55 @@ may be overridden specifying them in the options hash (third argument).
 
 =cut
 
-sub finger
-{
-  my $self     = shift;
-  my $request  = shift // '';
-  my $callback = shift // sub {};
-  my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
+  method finger($request, $callback, @args)
+  {
+    $request  //= '';
+    $callback //= sub {};
+    
+    my $args     = ref $args[0] eq 'HASH' ? (\%{$args[0]}) : ({@args});
+    my $hostname = $args->{hostname} // $!hostname;
+    my $port     = $args->{port}     // $!port;
+    my $timeout  = $args->{timeout}  // $!timeout;
+    my $on_error = $args->{on_error} // $!on_error;
+    
+    tcp_connect $hostname, $port, sub {
   
-  $args->{$_} //= $self->{$_}
-    for qw( hostname port timeout on_error );
-  
-  tcp_connect $args->{hostname}, $args->{port}, sub {
-  
-    my($fh) = @_;
-    return $args->{on_error}->("unable to connect: $!") unless $fh;
+      my($fh) = @_;
+      return $on_error->("unable to connect to $hostname:$port : $!") unless $fh;
     
-    my @lines;
+      my @lines;
+   
+      my $handle;
+      $handle = AnyEvent::Handle->new(
+        fh       => $fh,
+        on_error => sub {
+          my ($hdl, $fatal, $msg) = @_;
+          $on_error->($msg);
+          $_[0]->destroy;
+        },
+        on_eof   => sub {
+          $handle->destroy;
+          $callback->(\@lines);
+        },
+      );
     
-    my $handle;
-    $handle = AnyEvent::Handle->new(
-      fh       => $fh,
-      on_error => sub {
-        my ($hdl, $fatal, $msg) = @_;
-        $args->{on_error}->($msg);
-        $_[0]->destroy;
-      },
-      on_eof   => sub {
-        $handle->destroy;
-        $callback->(\@lines);
-      },
-    );
+      if(ref $request && $request->isa('AnyEvent::Finger::Request'))
+      { $request = $request->{raw} }
+      $handle->push_write("$request\015\012");
     
-    if(ref $request && $request->isa('AnyEvent::Finger::Request'))
-    { $request = $request->{raw} }
-    $handle->push_write("$request\015\012");
-    
-    $handle->on_read(sub {
-      $handle->push_read( line => sub {
-        my($handle, $line) = @_;
-        $line =~ s/\015?\012//g;
-        push @lines, $line;
+      $handle->on_read(sub {
+        $handle->push_read( line => sub {
+          my($handle, $line) = @_;
+          $line =~ s/\015?\012//g;
+          push @lines, $line;
+        });
       });
-    });
   
-  }, sub { $args->{timeout} };
+    }, sub { $args->{timeout} };
   
-  $self;
-}
+    $self;
+  } # method finger
+
+} # class Client
 
 1;
