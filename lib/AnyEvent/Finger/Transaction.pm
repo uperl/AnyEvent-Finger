@@ -16,7 +16,7 @@ L<AnyEvent::Finger::Server> server instance.  It also provides
 information about the connection (the remote, local ports and
 the remote client's address).
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
 =head2 $tx-E<gt>req
 
