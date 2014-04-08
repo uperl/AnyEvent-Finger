@@ -2,7 +2,6 @@ package AnyEvent::Finger::Transaction;
 
 use strict;
 use warnings;
-use v5.10;
 use overload '""' => sub { shift->as_string };
 
 # ABSTRACT: Simple asynchronous finger transaction

@@ -2,7 +2,6 @@ package AnyEvent::Finger::Response;
 
 use strict;
 use warnings;
-use v5.10;
 
 # ABSTRACT: Simple asynchronous finger response
 # VERSION

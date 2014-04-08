@@ -2,7 +2,6 @@ package AnyEvent::Finger::Server;
 
 use strict;
 use warnings;
-use v5.10;
 use Carp qw( carp croak );
 use AnyEvent;
 use AnyEvent::Handle;
@@ -112,13 +111,19 @@ sub new
 {
   my $class = shift;
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
+  my $port = $args->{port};
+  $port = 79 unless defined $port;
+  my $forward_deny = $args->{forward_deny};
+  $forward_deny = 0 unless defined $forward_deny;
+  my $forward = $args->{forward};
+  $forward = 0 unless defined $forward;
   bless {
     hostname     => $args->{hostname},  
-    port         => $args->{port}         // 79,
-    on_error     => $args->{on_error}     // sub { carp $_[0] },
-    on_bind      => $args->{on_bind}      // sub { },
-    forward_deny => $args->{forward_deny} // 0,
-    forward      => $args->{forward}      // 0,
+    port         => $port,
+    on_error     => $args->{on_error}     || sub { carp $_[0] },
+    on_bind      => $args->{on_bind}      || sub { },
+    forward_deny => $forward_deny,
+    forward      => $forward,
   }, $class;
 }
 
@@ -172,10 +177,15 @@ sub start
 
   croak "already started" if $self->{guard};
 
-  $args->{$_} //= $self->{$_}
-    for qw( hostname port on_error on_bind forward forward_deny );
+  for(qw( hostname port on_error on_bind forward forward_deny ))
+  {
+    next if defined $args->{$_};
+    $args->{$_} = $self->{$_};
+  }
+  
 
-  my $forward = $args->{forward} // $self->{forward};
+  my $forward = $args->{forward};
+  $forward = $self->{forward} unless defined $forward;
   if($forward)
   {
     unless(ref $forward)
@@ -241,7 +251,6 @@ sub start
       
       if($forward && $req->forward_request)
       {
-      
         my $host = pop @{ $req->hostnames };
         my $new_request = join '@', $req->username, @{ $req->hostnames };
         $new_request = '/W ' . $new_request if $req->verbose;

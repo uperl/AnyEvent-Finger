@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use v5.10;
 use AnyEvent;
 use AnyEvent::Finger::Client;
 
@@ -12,11 +11,13 @@ my $client = AnyEvent::Finger::Client->new;
 
 $client->finger(shift @ARGV, sub {
   my($lines) = @_;
-  say "[response]";
-  say join "\n", @$lines;
+  print "[response]\n";
+  print join "\n", @$lines;
+  print "\n";
   $done->send;
 }, on_error => sub {
-  say STDERR shift;
+  print STDERR shift;
+  print STDERR "\n"
   $done->send;
 });
 

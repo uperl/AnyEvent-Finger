@@ -2,7 +2,6 @@ package AnyEvent::Finger;
 
 use strict;
 use warnings;
-use v5.10;
 use Exporter ();
 
 our @ISA = qw( Exporter );
@@ -19,8 +18,8 @@ client:
  
  finger_client 'localhost', 'username', sub {
    my($lines) = @_;
-   say "[response]";
-   say join "\n", @$lines;
+   print "[response]\n";
+   print join "\n", @$lines;
  };
 
 server:
@@ -92,17 +91,18 @@ on the options and the callback.
 
 =cut
 
+# keep the server object in scope so that
+# we don't unbind from the port.  If you 
+# don't want this, then use the OO interface
+# for ::Server instead.
+my $keep = [];
+
 sub finger_server
 {
   require AnyEvent::Finger::Server;
   my $server = AnyEvent::Finger::Server
     ->new
     ->start(@_);
-  # keep the server object in scope so that
-  # we don't unbind from the port.  If you 
-  # don't want this, then use the OO interface
-  # for ::Server instead.
-  state $keep = [];
   push @$keep, $server;
   return $server;
 }

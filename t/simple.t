@@ -1,13 +1,12 @@
 use strict;
 use warnings;
-use v5.10;
 use Test::More tests => 3;
 use AnyEvent;
 use AnyEvent::Finger qw( finger_server finger_client );
 
 our $timeout = AnyEvent->timer( 
   after => 15, 
-  cb    => sub { say STDERR "TIMEOUT"; exit },
+  cb    => sub { diag "TIMEOUT"; exit },
 );
 
 my $port = eval { 
@@ -27,7 +26,7 @@ diag $@ if $@;
 
 like $port, qr{^[123456789]\d*$}, "bindport = $port";
 
-my $error = sub { say STDERR shift; exit 2 };
+my $error = sub { diag shift; exit 2 };
 
 subtest t1 => sub {
   my $done = AnyEvent->condvar;
