@@ -3,5 +3,5 @@ AnyEvent::Handle
 AnyEvent::Socket
 EV
 Exporter
-ExtUtils::MakeMaker
+Module::Build
 Test::More
