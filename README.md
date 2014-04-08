@@ -10,8 +10,8 @@ client:
     
     finger_client 'localhost', 'username', sub {
       my($lines) = @_;
-      say "[response]";
-      say join "\n", @$lines;
+      print "[response]\n";
+      print join "\n", @$lines;
     };
 
 server:
@@ -52,7 +52,7 @@ server:
 
 This distribution provides an asynchronous finger server and 
 client which can be used by any event loop supported by 
-[AnyEvent](http://search.cpan.org/perldoc?AnyEvent).  This specific module provides a simple procedural
+[AnyEvent](https://metacpan.org/pod/AnyEvent).  This specific module provides a simple procedural
 interface to client and server classes also in this distribution.
 
 # FUNCTIONS
@@ -62,12 +62,12 @@ interface to client and server classes also in this distribution.
 Send a finger request to the given server.  The callback will
 be called when the response is complete.  The options hash may
 be passed in as the optional forth argument to override any
-default options (See [AnyEvent::Finger::Client](http://search.cpan.org/perldoc?AnyEvent::Finger::Client) for details).
+default options (See [AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEvent::Finger::Client) for details).
 
 ## finger\_server( $callback, \[ \\%options \] )
 
 Start listening to finger callbacks and call the given callback
-for each request.  See [AnyEvent::Finger::Server](http://search.cpan.org/perldoc?AnyEvent::Finger::Server) for details
+for each request.  See [AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server) for details
 on the options and the callback.
 
 # CAVEATS
@@ -76,7 +76,7 @@ Finger is an oldish protocol and almost nobody uses it anymore.
 
 Most finger clients do not have a way to configure an alternate port.  
 Binding to the default port 79 on Unix usually requires root.  Running 
-[AnyEvent::Finger::Server](http://search.cpan.org/perldoc?AnyEvent::Finger::Server) as root is not recommended.
+[AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server) as root is not recommended.
 
 Under Linux you can use `iptables` to forward requests to port 79 to
 an unprivileged port.  I was able to use this incantation to forward port 79
@@ -91,8 +91,8 @@ for clients connecting via the loopback interface (localhost).
 # SEE ALSO
 
 [RFC1288](http://tools.ietf.org/html/rfc1288),
-[AnyEvent::Finger::Client](http://search.cpan.org/perldoc?AnyEvent::Finger::Client),
-[AnyEvent::Finger::Server](http://search.cpan.org/perldoc?AnyEvent::Finger::Server)
+[AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEvent::Finger::Client),
+[AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server)
 
 # AUTHOR
 
