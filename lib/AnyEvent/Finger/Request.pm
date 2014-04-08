@@ -2,7 +2,6 @@ package AnyEvent::Finger::Request;
 
 use strict;
 use warnings;
-use v5.10;
 use overload '""' => sub { shift->as_string };
 
 # ABSTRACT: Simple asynchronous finger request
@@ -28,7 +27,7 @@ The constructor takes a string which is the raw finger request.
 
 sub new
 {
-  bless { raw => "$_[1]" // '' }, $_[0];
+  bless { raw => "$_[1]" }, $_[0];
 }
 
 =head1 ATTRIBUTES
@@ -43,7 +42,7 @@ if request is not asking for a verbose response.
 sub verbose
 {
   my($self) = @_;
-  $self->{verbose} //= ($self->{raw} =~ /^\/W/ ? 1 : 0);
+  defined $self->{verbose} ? $self->{verbose} : $self->{verbose} = ($self->{raw} =~ /^\/W/ ? 1 : 0);
 }
 
 =head2 $request-E<gt>username
@@ -74,7 +73,8 @@ Returns a list of hostnames (as an array ref) in the request.
 sub hostnames
 {
   my($self) = @_;
-  $self->{hostnames} //= ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
+  return $self->{hostnames} if defined $self->{hostnames};
+  $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
 }
 
 =head2 $request-E<gt>as_string
