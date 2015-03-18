@@ -87,7 +87,7 @@ sub new
 
 =head2 finger
 
- $client-E<gt>finger($request, $callback, [ \%options ])
+ $client->finger($request, $callback, [ \%options ])
 
 Connect to the finger server make the given request and call the given callback
 when the response is complete.  The response will be passed to the callback as

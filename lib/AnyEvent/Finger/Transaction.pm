@@ -57,7 +57,7 @@ sub local_port { shift->{local_port} }
 
 =head2 remote_address
 
- my $address = $tx-E<gt>remote_address;
+ my $address = $tx->remote_address;
 
 Returns the IP address from whence the finger request is coming from.
 
