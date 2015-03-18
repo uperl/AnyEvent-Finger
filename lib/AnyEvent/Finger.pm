@@ -134,8 +134,46 @@ for clients connecting via the loopback interface (localhost).
 
 =head1 SEE ALSO
 
+=over 4
+
+=item
+
 L<RFC1288|http://tools.ietf.org/html/rfc1288>,
+
+=item
+
 L<AnyEvent::Finger::Client>,
+
+=item
+
 L<AnyEvent::Finger::Server>
+
+=item
+
+L<AnyEvent>
+
+Generic non-blocking event loop used by L<AnyEvent::Finger>
+
+=item
+
+L<Net::Finger>
+
+Blocking implementation of a finger client
+
+=item
+
+L<Net::Finger::Server>
+
+Blocking implementation of a finger server
+
+=item
+
+L<PlugAuth::Plugin::Finger>
+
+PlugAuth plugin that allows querying a PlugAuth server
+via the finger protocol.  Uses this module for its
+implementation.
+
+=back
 
 =cut

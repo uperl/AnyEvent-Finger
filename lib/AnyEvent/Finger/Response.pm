@@ -43,3 +43,24 @@ sub done
 }
 
 1;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+L<AnyEvent::Finger>
+
+=item
+
+L<AnyEvent::Finger::Client>
+
+=item
+
+L<AnyEvent::Finger::Server>
+
+=back
+
+=cut
+

@@ -66,3 +66,23 @@ Returns the IP address from whence the finger request is coming from.
 sub remote_address { shift->{remote_address} }
 
 1;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+L<AnyEvent::Finger>
+
+=item
+
+L<AnyEvent::Finger::Client>
+
+=item
+
+L<AnyEvent::Finger::Server>
+
+=back
+
+=cut

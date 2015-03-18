@@ -123,3 +123,23 @@ Return true if the request is to query another host.
 sub forward_request { @{ shift->hostnames } > 0 ? 1 : 0}
 
 1;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+L<AnyEvent::Finger>
+
+=item
+
+L<AnyEvent::Finger::Client>
+
+=item
+
+L<AnyEvent::Finger::Server>
+
+=back
+
+=cut

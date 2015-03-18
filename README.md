@@ -94,9 +94,26 @@ for clients connecting via the loopback interface (localhost).
 
 # SEE ALSO
 
-[RFC1288](http://tools.ietf.org/html/rfc1288),
-[AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEvent::Finger::Client),
-[AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server)
+- [RFC1288](http://tools.ietf.org/html/rfc1288),
+- [AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEvent::Finger::Client),
+- [AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server)
+- [AnyEvent](https://metacpan.org/pod/AnyEvent)
+
+    Generic non-blocking event loop used by [AnyEvent::Finger](https://metacpan.org/pod/AnyEvent::Finger)
+
+- [Net::Finger](https://metacpan.org/pod/Net::Finger)
+
+    Blocking implementation of a finger client
+
+- [Net::Finger::Server](https://metacpan.org/pod/Net::Finger::Server)
+
+    Blocking implementation of a finger server
+
+- [PlugAuth::Plugin::Finger](https://metacpan.org/pod/PlugAuth::Plugin::Finger)
+
+    PlugAuth plugin that allows querying a PlugAuth server
+    via the finger protocol.  Uses this module for its
+    implementation.
 
 # AUTHOR
 
