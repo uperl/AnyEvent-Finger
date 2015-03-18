@@ -34,6 +34,8 @@ Provide a simple asynchronous finger client.
 
 =head1 CONSTRUCTOR
 
+ my $client = AnyEvent::Finger::Client->new(%options);
+
 The constructor takes the following optional arguments:
 
 =over 4
@@ -83,7 +85,9 @@ sub new
 
 =head1 METHODS
 
-=head2 $client-E<gt>finger($request, $callback, [ \%options ])
+=head2 finger
+
+ $client-E<gt>finger($request, $callback, [ \%options ])
 
 Connect to the finger server make the given request and call the given callback
 when the response is complete.  The response will be passed to the callback as

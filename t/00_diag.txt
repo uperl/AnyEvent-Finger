@@ -1,7 +1,4 @@
 AnyEvent
-AnyEvent::Handle
-AnyEvent::Socket
 EV
-Exporter
 Module::Build
 Test::More

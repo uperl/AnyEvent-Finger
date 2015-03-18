@@ -19,7 +19,9 @@ See the documentation on that class for more details.
 
 =head1 CONSTRUCTOR
 
-=head2 AnyEvent::Finger::Request->new( $address )
+=head2 new
+
+ my $request = AnyEvent::Finger::Request->new( $address )
 
 The constructor takes a string which is the raw finger request.
 
@@ -32,7 +34,11 @@ sub new
 
 =head1 ATTRIBUTES
 
-=head2 $request-E<gt>verbose
+All attributes for this class are read only.
+
+=head2 verbose
+
+ my $value = $request->verbose
 
 True if request is asking for a verbose response.  False
 if request is not asking for a verbose response.
@@ -45,7 +51,9 @@ sub verbose
   defined $self->{verbose} ? $self->{verbose} : $self->{verbose} = ($self->{raw} =~ /^\/W/ ? 1 : 0);
 }
 
-=head2 $request-E<gt>username
+=head2 username
+
+ my $value = $request->username
 
 The username being requested.
 
@@ -64,7 +72,9 @@ sub username
   $self->{username};
 }
 
-=head2 $request-E<gt>hostnames
+=head2 hostnames
+
+ my $value = $request->hostnames
 
 Returns a list of hostnames (as an array ref) in the request.
 
@@ -77,7 +87,9 @@ sub hostnames
   $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
 }
 
-=head2 $request-E<gt>as_string
+=head2 as_string
+
+ my $value = $request->as_string
 
 Converts just the username and hostnames fields into a string.
 
@@ -89,7 +101,9 @@ sub as_string
   join('@', ($self->username, @{ $self->hostnames }));
 }
 
-=head2 $request-E<gt>listing_request
+=head2 listing_request
+
+ my $value = $request->listing_request
 
 Return true if the request is for a listing of users.
 
@@ -98,7 +112,9 @@ Return true if the request is for a listing of users.
 sub listing_request { shift->username eq '' ? 1 : 0 }
 
 
-=head2 $request-E<gt>forward_request
+=head2 forward_request
+
+ my $value = $request->forward_request
 
 Return true if the request is to query another host.
 

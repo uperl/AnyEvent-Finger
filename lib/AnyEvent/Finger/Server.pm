@@ -54,6 +54,10 @@ Provide a simple asynchronous finger server.
 
 =head1 CONSTRUCTOR
 
+=head2 new
+
+ my $server = AnyEvent::Finger::Server->new(%args);
+
 The constructor takes the following optional arguments:
 
 =over 4
@@ -129,7 +133,9 @@ sub new
 
 =head1 METHODS
 
-=head2 $server-E<gt>start( $callback )
+=head2 start
+
+ $server->start( $callback )
 
 Start the finger server.  The callback will be called each time a
 client connects.
@@ -278,7 +284,9 @@ sub start
   $self;
 }
 
-=head2 $server-E<gt>bindport
+=head2 bindport
+
+ $server->bindport
 
 The bind port.  If port is set to zero in the constructor or on
 start, then an ephemeral port will be used, and you can get the
@@ -291,7 +299,9 @@ use the C<on_bind> callback.
 
 sub bindport { shift->{bindport} }
 
-=head2 $server-E<gt>stop
+=head2 stop
+
+ $server->stop
 
 Stop the server and unbind to the port.
 

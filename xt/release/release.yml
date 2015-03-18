@@ -5,6 +5,8 @@ pod_spelling_system:
     - hostnames
     - TCP
     - IP
+    - bindport
+    - req
 
 pod_coverage:
   private:

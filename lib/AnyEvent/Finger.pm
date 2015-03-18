@@ -65,7 +65,9 @@ interface to client and server classes also in this distribution.
 
 =head1 FUNCTIONS
 
-=head2 finger_client( $server, $request, $callback, [ \%options ] )
+=head2 finger_client
+
+ finger_client( $server, $request, $callback, [ \%options ] )
 
 Send a finger request to the given server.  The callback will
 be called when the response is complete.  The options hash may
@@ -74,16 +76,19 @@ default options (See L<AnyEvent::Finger::Client> for details).
 
 =cut
 
-sub finger_client
+sub finger_client ($$$;$)
 {
   my($hostname) = shift;
   require AnyEvent::Finger::Client;
   AnyEvent::Finger::Client
     ->new( hostname => $hostname )
     ->finger(@_);
+  ();
 }
 
-=head2 finger_server( $callback, [ \%options ] )
+=head2 finger_server
+
+ my $server = finger_server $callback, \%options;
 
 Start listening to finger callbacks and call the given callback
 for each request.  See L<AnyEvent::Finger::Server> for details
@@ -97,14 +102,14 @@ on the options and the callback.
 # for ::Server instead.
 my $keep = [];
 
-sub finger_server
+sub finger_server ($;$)
 {
   require AnyEvent::Finger::Server;
   my $server = AnyEvent::Finger::Server
     ->new
     ->start(@_);
   push @$keep, $server;
-  return $server;
+  $server;
 }
 
 1;

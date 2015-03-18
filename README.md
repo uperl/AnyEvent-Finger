@@ -57,14 +57,18 @@ interface to client and server classes also in this distribution.
 
 # FUNCTIONS
 
-## finger\_client( $server, $request, $callback, \[ \\%options \] )
+## finger\_client
+
+    finger_client( $server, $request, $callback, [ \%options ] )
 
 Send a finger request to the given server.  The callback will
 be called when the response is complete.  The options hash may
 be passed in as the optional forth argument to override any
 default options (See [AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEvent::Finger::Client) for details).
 
-## finger\_server( $callback, \[ \\%options \] )
+## finger\_server
+
+    my $server = finger_server $callback, \%options;
 
 Start listening to finger callbacks and call the given callback
 for each request.  See [AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server) for details
