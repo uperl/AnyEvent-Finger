@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.10      2015-03-18 02:16:24 -0400
+  - Documentation improvements
+
 0.09      2014-04-08 14:38:42 -0400
   - Support for Perl 5.8
 
