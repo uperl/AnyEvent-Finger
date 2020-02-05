@@ -6,47 +6,51 @@ Simple asynchronous finger client and server
 
 client:
 
-    use AnyEvent::Finger qw( finger_client );
-    
-    finger_client 'localhost', 'username', sub {
-      my($lines) = @_;
-      print "[response]\n";
-      print join "\n", @$lines;
-    };
+```perl
+use AnyEvent::Finger qw( finger_client );
+
+finger_client 'localhost', 'username', sub {
+  my($lines) = @_;
+  print "[response]\n";
+  print join "\n", @$lines;
+};
+```
 
 server:
 
-    use AnyEvent::Finger qw( finger_server );
-    
-    my %users = (
-      grimlock => 'ME GRIMLOCK HAVE ACCOUNT ON THIS MACHINE',
-      optimus  => 'Freedom is the right of all sentient beings.',
-    );
-    
-    finger_server sub {
-      my $tx = shift; # isa AnyEvent::Finger::Transaction
-      if($tx->req->listing_request)
-      {
-        # respond if remote requests list of users
-        $tx->res->say('users: ', keys %users);
-      }
-      else
-      {
-        # respond if user exists
-        if(defined $users{$tx->req->username})
-        {
-          $tx->res->say($users{$request});
-        }
-        # respond if user does not exist
-        else
-        {
-          $tx->res->say('no such user');
-        }
-      }
-      # required! done generating the reply,
-      # close the connection with the client.
-      $tx->res->done;
-    };
+```perl
+use AnyEvent::Finger qw( finger_server );
+
+my %users = (
+  grimlock => 'ME GRIMLOCK HAVE ACCOUNT ON THIS MACHINE',
+  optimus  => 'Freedom is the right of all sentient beings.',
+);
+
+finger_server sub {
+  my $tx = shift; # isa AnyEvent::Finger::Transaction
+  if($tx->req->listing_request)
+  {
+    # respond if remote requests list of users
+    $tx->res->say('users: ', keys %users);
+  }
+  else
+  {
+    # respond if user exists
+    if(defined $users{$tx->req->username})
+    {
+      $tx->res->say($users{$request});
+    }
+    # respond if user does not exist
+    else
+    {
+      $tx->res->say('no such user');
+    }
+  }
+  # required! done generating the reply,
+  # close the connection with the client.
+  $tx->res->done;
+};
+```
 
 # DESCRIPTION
 
@@ -59,7 +63,9 @@ interface to client and server classes also in this distribution.
 
 ## finger\_client
 
-    finger_client( $server, $request, $callback, [ \%options ] )
+```
+finger_client( $server, $request, $callback, [ \%options ] )
+```
 
 Send a finger request to the given server.  The callback will
 be called when the response is complete.  The options hash may
@@ -68,7 +74,9 @@ default options (See [AnyEvent::Finger::Client](https://metacpan.org/pod/AnyEven
 
 ## finger\_server
 
-    my $server = finger_server $callback, \%options;
+```perl
+my $server = finger_server $callback, \%options;
+```
 
 Start listening to finger callbacks and call the given callback
 for each request.  See [AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server) for details
@@ -89,8 +97,10 @@ Under Linux you can use `iptables` to forward requests to port 79 to
 an unprivileged port.  I was able to use this incantation to forward port 79
 to port 8079:
 
-    # iptables -t nat -A PREROUTING -p tcp --dport 79 -j REDIRECT --to-port 8079
-    # iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 79 -j REDIRECT --to-port 8079
+```
+# iptables -t nat -A PREROUTING -p tcp --dport 79 -j REDIRECT --to-port 8079
+# iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 79 -j REDIRECT --to-port 8079
+```
 
 The first rule is sufficient for external clients, the second rule was required
 for clients connecting via the loopback interface (localhost).
