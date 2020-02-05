@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Diagnostic release
 
 0.10      2015-03-18 02:16:24 -0400
   - Documentation improvements
