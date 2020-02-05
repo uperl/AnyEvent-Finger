@@ -84,9 +84,6 @@ on the options and the callback.
 
 # CAVEATS
 
-[AnyEvent](https://metacpan.org/pod/AnyEvent) (a dependency of this module) is no longer supported on Perl 5.22
-by its author.
-
 Finger is an oldish protocol and almost nobody uses it anymore.
 
 Most finger clients do not have a way to configure an alternate port.  

@@ -151,11 +151,6 @@ sub finger
 
 1;
 
-=head1 CAVEATS
-
-L<AnyEvent> (a dependency of this module) is no longer supported on Perl 5.22
-by its author.
-
 =head1 SEE ALSO
 
 =over 4
