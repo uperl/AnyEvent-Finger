@@ -14,6 +14,7 @@ $modules{$_} = $_ for qw(
   AnyEvent
   EV
   ExtUtils::MakeMaker
+  Socket
   Test::More
 );
 
