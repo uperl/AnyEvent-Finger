@@ -16,7 +16,7 @@ use Carp qw( carp );
  
  my $done = AnyEvent->condvar;
  
- my $client = AnyEvent::Finger::Client->new( 
+ my $client = AnyEvent::Finger::Client->new(
    hostname => 'localhost',
  );
  
@@ -75,8 +75,8 @@ sub new
   my $args  = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
   my $port  = $args->{port};
   $port = 79 unless defined $port;
-  bless { 
-    hostname => $args->{hostname} || '127.0.0.1',  
+  bless {
+    hostname => $args->{hostname} || '127.0.0.1',
     port     => $port,
     timeout  => $args->{timeout}  || 60,
     on_error => $args->{on_error} || sub { carp $_[0] },
@@ -104,20 +104,20 @@ sub finger
   $request = '' unless defined $request;
   my $callback = shift || sub {};
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
-  
+
   for(qw( hostname port timeout on_error ))
   {
     next if defined $args->{$_};
     $args->{$_} = $self->{$_};
   }
-  
+
   tcp_connect $args->{hostname}, $args->{port}, sub {
-  
+
     my($fh) = @_;
     return $args->{on_error}->("unable to connect: $!") unless $fh;
-    
+
     my @lines;
-    
+
     my $handle;
     $handle = AnyEvent::Handle->new(
       fh       => $fh,
@@ -131,11 +131,11 @@ sub finger
         $callback->(\@lines);
       },
     );
-    
+
     if(ref $request && $request->isa('AnyEvent::Finger::Request'))
     { $request = $request->{raw} }
     $handle->push_write("$request\015\012");
-    
+
     $handle->on_read(sub {
       $handle->push_read( line => sub {
         my($handle, $line) = @_;
@@ -143,9 +143,9 @@ sub finger
         push @lines, $line;
       });
     });
-  
+
   }, sub { $args->{timeout} };
-  
+
   $self;
 }
 

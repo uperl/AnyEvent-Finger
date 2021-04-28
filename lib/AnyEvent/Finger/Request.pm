@@ -2,7 +2,9 @@ package AnyEvent::Finger::Request;
 
 use strict;
 use warnings;
-use overload '""' => sub { shift->as_string };
+use overload
+  '""' => sub { shift->as_string },
+  bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Simple asynchronous finger request
 # VERSION
@@ -62,13 +64,13 @@ The username being requested.
 sub username
 {
   my($self) = @_;
-  
+
   unless(defined $self->{username})
   {
     if($self->{raw} =~ /^(?:\/W\s*)?([^@]*)/)
     { $self->{username} = $1 }
   }
-  
+
   $self->{username};
 }
 
@@ -84,7 +86,7 @@ sub hostnames
 {
   my($self) = @_;
   return $self->{hostnames} if defined $self->{hostnames};
-  $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
+  $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split /\@/, $1] : []);
 }
 
 =head2 as_string

@@ -2,9 +2,8 @@ package AnyEvent::Finger;
 
 use strict;
 use warnings;
-use Exporter ();
+use base qw( Exporter );
 
-our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( finger_client finger_server );
 
 # ABSTRACT: Simple asynchronous finger client and server
@@ -58,8 +57,8 @@ server:
 
 =head1 DESCRIPTION
 
-This distribution provides an asynchronous finger server and 
-client which can be used by any event loop supported by 
+This distribution provides an asynchronous finger server and
+client which can be used by any event loop supported by
 L<AnyEvent>.  This specific module provides a simple procedural
 interface to client and server classes also in this distribution.
 
@@ -97,7 +96,7 @@ on the options and the callback.
 =cut
 
 # keep the server object in scope so that
-# we don't unbind from the port.  If you 
+# we don't unbind from the port.  If you
 # don't want this, then use the OO interface
 # for ::Server instead.
 my $keep = [];
@@ -118,8 +117,8 @@ sub finger_server ($;$)
 
 Finger is an oldish protocol and almost nobody uses it anymore.
 
-Most finger clients do not have a way to configure an alternate port.  
-Binding to the default port 79 on Unix usually requires root.  Running 
+Most finger clients do not have a way to configure an alternate port.
+Binding to the default port 79 on Unix usually requires root.  Running
 L<AnyEvent::Finger::Server> as root is not recommended.
 
 Under Linux you can use C<iptables> to forward requests to port 79 to
