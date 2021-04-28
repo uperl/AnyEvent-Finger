@@ -54,8 +54,8 @@ finger_server sub {
 
 # DESCRIPTION
 
-This distribution provides an asynchronous finger server and 
-client which can be used by any event loop supported by 
+This distribution provides an asynchronous finger server and
+client which can be used by any event loop supported by
 [AnyEvent](https://metacpan.org/pod/AnyEvent).  This specific module provides a simple procedural
 interface to client and server classes also in this distribution.
 
@@ -86,8 +86,8 @@ on the options and the callback.
 
 Finger is an oldish protocol and almost nobody uses it anymore.
 
-Most finger clients do not have a way to configure an alternate port.  
-Binding to the default port 79 on Unix usually requires root.  Running 
+Most finger clients do not have a way to configure an alternate port.
+Binding to the default port 79 on Unix usually requires root.  Running
 [AnyEvent::Finger::Server](https://metacpan.org/pod/AnyEvent::Finger::Server) as root is not recommended.
 
 Under Linux you can use `iptables` to forward requests to port 79 to
@@ -131,7 +131,7 @@ Graham Ollis <plicease@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
