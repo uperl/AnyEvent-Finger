@@ -18,7 +18,7 @@ the documentation on that class for more details.
 
  $response->say( @lines )
 
-Send the lines to the client.  Do not include new line characters (\r, 
+Send the lines to the client.  Do not include new line characters (\r,
 \n or \r\n), these will be added by L<AnyEvent::Finger::Server>.
 
 =cut

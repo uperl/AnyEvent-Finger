@@ -94,8 +94,8 @@ object.
 
 forward_deny (0)
 
-Deny forward requests, (for example: C<finger@host1@host2@...> style requests).  
-If neither C<forward_deny> or C<forward> is specified then forward requests will 
+Deny forward requests, (for example: C<finger@host1@host2@...> style requests).
+If neither C<forward_deny> or C<forward> is specified then forward requests will
 be passed on to the callback, like all other requests.
 
 =item *
@@ -122,7 +122,7 @@ sub new
   my $forward = $args->{forward};
   $forward = 0 unless defined $forward;
   bless {
-    hostname     => $args->{hostname},  
+    hostname     => $args->{hostname},
     port         => $port,
     on_error     => $args->{on_error}     || sub { carp $_[0] },
     on_bind      => $args->{on_bind}      || sub { },
@@ -145,15 +145,15 @@ client connects.
 The first argument passed to the callback is the transaction object,
 which is an instance of L<AnyEvent::Finger::Transaction>.  The most
 important members of these objects that you will want to interact
-with are C<$tx-E<gt>req> for the request (an instance of 
+with are C<$tx-E<gt>req> for the request (an instance of
 L<AnyEvent::Finger::Request>) and C<$tx-E<gt>res> for the response
 interface (an instance of L<AnyEvent::Finger::Response>).
 
 With the response object you can return a whole response at one time:
 
  $tx->res->say(
-   "this is the first line", 
-   "this is the second line", 
+   "this is the first line",
+   "this is the second line",
    "there will be no forth line",
  );
  $tx->res->done;
@@ -172,7 +172,7 @@ asynchronously).
 The server will unbind from its port and stop if the server
 object falls out of scope, or if the C<stop> method (see below)
 is called.
- 
+
 =cut
 
 sub start
@@ -188,7 +188,7 @@ sub start
     next if defined $args->{$_};
     $args->{$_} = $self->{$_};
   }
-  
+
 
   my $forward = $args->{forward};
   $forward = $self->{forward} unless defined $forward;
@@ -200,7 +200,7 @@ sub start
       $args->{forward} = AnyEvent::Finger::Client->new;
     }
   }
-    
+
   my $cb = sub {
     my ($fh, $host, $port) = @_;
 
@@ -240,21 +240,21 @@ sub start
 
       bless $res, 'AnyEvent::Finger::Response';
       my $req = AnyEvent::Finger::Request->new($line);
-      
-      my $tx = bless { 
-        req            => $req, 
+
+      my $tx = bless {
+        req            => $req,
         res            => $res,
         remote_port    => $port,
         local_port     => $self->{bindport},
         remote_address => $host,
       }, 'AnyEvent::Finger::Transaction';
-      
+
       if($args->{forward_deny} && $tx->req->forward_request)
       {
         $res->(['finger forwarding service denied', undef]);
         return;
       }
-      
+
       if($forward && $req->forward_request)
       {
         my $host = pop @{ $req->hostnames };
@@ -271,16 +271,16 @@ sub start
       $callback->($tx);
     });
   };
-  
+
   my $port = $args->{port};
   undef $port if $port == 0;
-  
+
   $self->{guard} = tcp_server $args->{hostname}, $port, $cb, sub {
     my($fh, $host, $port) = @_;
     $self->{bindport} = $port;
     $args->{on_bind}->($self);
   };
-  
+
   $self;
 }
 

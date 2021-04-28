@@ -2,7 +2,9 @@ package AnyEvent::Finger::Transaction;
 
 use strict;
 use warnings;
-use overload '""' => sub { shift->as_string };
+use overload
+  '""' => sub { shift->as_string },
+  bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Simple asynchronous finger transaction
 # VERSION
@@ -10,7 +12,7 @@ use overload '""' => sub { shift->as_string };
 =head1 DESCRIPTION
 
 This class is a container for response and request objects
-which is used when a finger request comes into 
+which is used when a finger request comes into
 L<AnyEvent::Finger::Server> server instance.  It also provides
 information about the connection (the remote, local ports and
 the remote client's address).
