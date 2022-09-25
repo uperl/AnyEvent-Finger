@@ -1,4 +1,4 @@
-# AnyEvent::Finger ![linux](https://github.com/uperl/AnyEvent-Finger/workflows/linux/badge.svg) ![macos](https://github.com/uperl/AnyEvent-Finger/workflows/macos/badge.svg) ![windows](https://github.com/uperl/AnyEvent-Finger/workflows/windows/badge.svg) ![cygwin](https://github.com/uperl/AnyEvent-Finger/workflows/cygwin/badge.svg) ![msys2-mingw](https://github.com/uperl/AnyEvent-Finger/workflows/msys2-mingw/badge.svg)
+# AnyEvent::Finger ![static](https://github.com/uperl/AnyEvent-Finger/workflows/static/badge.svg) ![linux](https://github.com/uperl/AnyEvent-Finger/workflows/linux/badge.svg)
 
 Simple asynchronous finger client and server
 
@@ -131,7 +131,7 @@ Graham Ollis <plicease@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2021 by Graham Ollis.
+This software is copyright (c) 2012-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
