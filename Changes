@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.14      2022-09-25 13:25:52 -0600
   - Removed overload on AnyEvent::Finger::Transaction
     which was unintentional and worse incomplete (gh#6, gh#8)
 
